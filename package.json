@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "node server/index.js"
+    "serve": "node server/index.ts",
+    "watch": "tsc -w -p tsconfig.json",
+    "build": "tsc -p tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -24,5 +25,10 @@
     "express": "^4.18.2",
     "fs": "^0.0.1-security",
     "prettier": "^2.8.3"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "@types/react": "^18.0.26",
+    "typescript": "^4.9.4"
   }
 }
