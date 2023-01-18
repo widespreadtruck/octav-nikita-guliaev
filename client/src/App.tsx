@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useCallback, useMemo } from "react"
 import "./App.css"
 import axios from "axios"
 
@@ -40,16 +40,22 @@ const App: React.FC = React.memo(() => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setIsLoading(true)
     try {
       const response = await axios.get("/wallet")
-      setPortfolioData(response.data)
+      setPortfolioData(response.data.assetByProtocols.wallet.chains)
     } catch (err: any) {
       setError({ message: err.message })
     } finally {
       setIsLoading(false)
     }
+  }, [])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
+
   const calculateBalancesInWallet = useMemo(() => {
     if (!portfolioData) return
 
@@ -73,7 +79,7 @@ const App: React.FC = React.memo(() => {
           }
         } else {
           symbolTotals[asset.symbol].balance += asset.balance
-  }
+        }
       })
     })
     return symbolTotals
@@ -88,6 +94,7 @@ const App: React.FC = React.memo(() => {
     }
   }, [portfolioData, calculateBalancesInWallet])
 
+  console.log({ portfolioSummary })
 
   if (isLoading) {
     return <p>Loading...</p>
@@ -107,8 +114,7 @@ const App: React.FC = React.memo(() => {
 
   if (!isLoading && error == null) {
     // console.log(portfolioData)
-    console.log(portfolioData.assetByProtocols.wallet.chains)
-
+    // console.log(portfolioData.assetByProtocols.wallet.chains)
     // Object.entries(portfolioData.assetByProtocols.wallet.chains).map(
     //   ([key, value]) => console.log(value)
     // )
@@ -117,9 +123,11 @@ const App: React.FC = React.memo(() => {
   const AssetItem = ({
     iconAddress,
     tokenName,
+    balance,
   }: {
     iconAddress: string
     tokenName: string
+    balance: number
   }) => {
     return (
       <li className="flex flex-row mb-2 border-gray-400">
@@ -140,7 +148,7 @@ const App: React.FC = React.memo(() => {
             </div>
           </div>
           <div className="text-xs text-gray-600 dark:text-gray-200">
-            Balance
+            {balance}
           </div>
           <button className="flex justify-end w-24 text-right">
             <svg
@@ -161,21 +169,20 @@ const App: React.FC = React.memo(() => {
 
   return (
     <>
-      {isLoading || error != null ? (
+      {!portfolioSummary ? (
         <div>Loading...</div>
       ) : (
         <div>
           <div className="container flex flex-col items-center justify-center w-full mx-auto">
             <ul className="flex flex-col">
-              {Object.entries(portfolioData.assetByProtocols.wallet.chains).map(
-                ([key, value]) => (
-                  <AssetItem
-                    key={key}
-                    iconAddress={value.imgSmall}
-                    tokenName={key}
-                  />
-                )
-              )}
+              {Object.values(portfolioSummary).map((value) => (
+                <AssetItem
+                  key={value.symbol}
+                  iconAddress={value.imgSmall}
+                  tokenName={value.symbol.toUpperCase()}
+                  balance={value.balance}
+                />
+              ))}
             </ul>
           </div>
 
@@ -184,6 +191,6 @@ const App: React.FC = React.memo(() => {
       )}
     </>
   )
-}
+})
 
 export default App
