@@ -6,12 +6,37 @@ interface Error {
   message: string
 }
 
-const App: React.FC = () => {
-  const [portfolioData, setPortfolioData] = useState<{
-    assetByProtocols: {
-      wallet: { chains: Record<string, { imgSmall: string }> }
+interface Asset {
+  balance: number
+  chainKey: string
+  symbol: string
+  imgSmall: string
+}
+
+interface Chain {
+  key: string
+  protocolPositions: {
+    WALLET: {
+      assets: Asset[]
     }
-  } | null>(null)
+  }
+}
+
+interface Portfolio {
+  [key: string]: Chain
+}
+
+const App: React.FC = React.memo(() => {
+  const [portfolioData, setPortfolioData] = useState<Portfolio | null>(null)
+  const [portfolioSummary, setPortfolioSummary] = useState<{
+    [key: string]: {
+      symbol: string
+      chainKey: string
+      balance: number
+      imgSmall: string
+    }
+  }>({})
+
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
 
@@ -25,11 +50,44 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false)
     }
+  const calculateBalancesInWallet = useMemo(() => {
+    if (!portfolioData) return
+
+    const symbolTotals: {
+      [key: string]: {
+        symbol: string
+        chainKey: string
+        balance: number
+        imgSmall: string
+      }
+    } = {}
+
+    Object.values(portfolioData).forEach((chain) => {
+      chain.protocolPositions.WALLET.assets.forEach((asset) => {
+        if (!symbolTotals[asset.symbol]) {
+          symbolTotals[asset.symbol] = {
+            symbol: asset.symbol,
+            chainKey: chain.key,
+            balance: asset.balance,
+            imgSmall: asset.imgSmall,
+          }
+        } else {
+          symbolTotals[asset.symbol].balance += asset.balance
   }
+      })
+    })
+    return symbolTotals
+  }, [portfolioData])
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    if (portfolioData) {
+      const balances = calculateBalancesInWallet
+      if (balances) {
+        setPortfolioSummary(balances)
+      }
+    }
+  }, [portfolioData, calculateBalancesInWallet])
+
 
   if (isLoading) {
     return <p>Loading...</p>
