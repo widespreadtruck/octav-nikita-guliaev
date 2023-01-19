@@ -35,6 +35,8 @@ const App: React.FC = React.memo(() => {
       chainKey: string
       balance: number
       imgSmall: string
+      nonScientificStringBalance: string
+      fourDecimalsStringBalance: string
     }
   }>({})
 
@@ -57,17 +59,6 @@ const App: React.FC = React.memo(() => {
     fetchData()
   }, [fetchData])
 
-  // function convertToRegularNumber(num: number) {
-  //   let numString = num.toString()
-  //   let eIndex = numString.indexOf("e")
-  //   if (eIndex === -1) return num
-  //   let exponent = parseInt(numString.slice(eIndex + 1))
-  //   let decimalPlaces = -exponent
-  //   let decimalNum = num.toFixed(decimalPlaces)
-  //   let zeroes = "0".repeat(decimalPlaces)
-  //   return Number("0." + zeroes + decimalNum.slice(2))
-  // }
-
   const getWalletInformation = useMemo(() => {
     if (!portfolioData) return
 
@@ -77,7 +68,8 @@ const App: React.FC = React.memo(() => {
         chainKey: string
         balance: any
         imgSmall: string
-        fullNumberBalance: null | string
+        nonScientificStringBalance: null | string
+        fourDecimalsStringBalance: null | string
       }
     } = {}
 
@@ -89,7 +81,8 @@ const App: React.FC = React.memo(() => {
             chainKey: chain.key,
             balance: asset.balance,
             imgSmall: asset.imgSmall,
-            fullNumberBalance: null,
+            nonScientificStringBalance: null,
+            fourDecimalsStringBalance: null,
           }
         } else {
           walletAssetInfo[asset.symbol].balance += asset.balance
@@ -100,28 +93,40 @@ const App: React.FC = React.memo(() => {
     return walletAssetInfo
   }, [portfolioData])
 
+  const convertBalances = (obj: any) => {
+    // this func converts scientific nums to regular nums
+    // also adds 'nonScientificStringBalance' &
+    // 'fourDecimalsStringBalance' to the object
+    // these values would be used to render Wallet Asses info
+    for (let token in obj) {
+      // find if the num is a scientific number
+      let numString = obj[token].balance.toString()
+      let isAScientificNumber = numString.indexOf("e")
+      // add 'nonScientificStringBalance' & 'fourDecimalsStringBalance'
+      if (isAScientificNumber === -1) {
+        const fourDecimalsStringBalance = obj[token].balance.toFixed(4)
+        obj[token].nonScientificStringBalance = fourDecimalsStringBalance
+        obj[token].fourDecimalsStringBalance = fourDecimalsStringBalance
+      } else {
+        let decimalNum = new Decimal(obj[token].balance)
+        let decimalPlaces = decimalNum.decimalPlaces()
+        const nonScientificStringNumber = new Decimal(obj[token].balance)
+        new Decimal(obj[token].balance)
+        obj[token].nonScientificStringBalance =
+          nonScientificStringNumber.toFixed(decimalPlaces)
+        obj[token].fourDecimalsStringBalance =
+          nonScientificStringNumber.toFixed(4)
+      }
+    }
+    return obj
+  }
+
   useEffect(() => {
     if (portfolioData) {
       let copyWalletInfo = getWalletInformation
       if (copyWalletInfo) {
-        for (let token in copyWalletInfo) {
-          // find the num of decimals places
-          let numString = copyWalletInfo[token].balance.toString()
-          let eIndex = numString.indexOf("e")
-          // add a new key to the asset info object
-          // representing a regular number
-          // in addition to a scientific number 
-          if (eIndex === -1) {
-            copyWalletInfo[token].fullNumberBalance =
-              copyWalletInfo[token].balance.toFixed(4)
-          } else {
-            let decimalPlaces = Math.abs(parseInt(numString.slice(eIndex + 1)))
-            copyWalletInfo[token].fullNumberBalance = new Decimal(
-              copyWalletInfo[token].balance
-            ).toFixed(40)
-          }
-        }
-        setPortfolioSummary(copyWalletInfo)
+        const updatedWalletInfo = convertBalances(copyWalletInfo)
+        setPortfolioSummary(updatedWalletInfo)
       }
     }
   }, [portfolioData, getWalletInformation])
@@ -155,11 +160,11 @@ const App: React.FC = React.memo(() => {
   const AssetItem = ({
     iconAddress,
     tokenName,
-    balance,
+    fourDecimalsBalance,
   }: {
     iconAddress: string
     tokenName: string
-    balance: number
+    fourDecimalsBalance: string
   }) => {
     return (
       <li className="flex flex-row mb-2 border-gray-400">
@@ -180,7 +185,7 @@ const App: React.FC = React.memo(() => {
             </div>
           </div>
           <div className="text-xs text-gray-600 dark:text-gray-200">
-            {balance}
+            {fourDecimalsBalance}
           </div>
           <button className="flex justify-end w-24 text-right">
             <svg
@@ -212,7 +217,7 @@ const App: React.FC = React.memo(() => {
                   key={value.symbol}
                   iconAddress={value.imgSmall}
                   tokenName={value.symbol.toUpperCase()}
-                  balance={value.balance}
+                  fourDecimalsBalance={value.fourDecimalsStringBalance}
                 />
               ))}
             </ul>
