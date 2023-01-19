@@ -13,6 +13,7 @@ interface Asset {
   symbol: string
   imgSmall: string
   decimal: number
+  chainContract: string
 }
 
 interface Chain {
@@ -30,6 +31,9 @@ interface Portfolio {
 
 const App: React.FC = React.memo(() => {
   const [portfolioData, setPortfolioData] = useState<Portfolio | null>(null)
+  const [pricesData, setPricesData] = useState<any>(null)
+  const [priceQuery, setPriceQuery] = useState<any>("")
+
   const [portfolioSummary, setPortfolioSummary] = useState<{
     [key: string]: {
       symbol: string
@@ -37,6 +41,7 @@ const App: React.FC = React.memo(() => {
       balance: number
       imgSmall: string
       decimal: number
+      chainContract: string
       fullStringBalance: string
       fourDecimalsStringBalance: string
     }
@@ -71,6 +76,7 @@ const App: React.FC = React.memo(() => {
         balance: any
         imgSmall: string
         decimal: number
+        chainContract: string
         fullStringBalance: null | string
         fourDecimalsStringBalance: null | string
       }
@@ -85,6 +91,7 @@ const App: React.FC = React.memo(() => {
             balance: asset.balance,
             imgSmall: asset.imgSmall,
             decimal: asset.decimal,
+            chainContract: asset.chainContract,
             fullStringBalance: null,
             fourDecimalsStringBalance: null,
           }
@@ -115,19 +122,43 @@ const App: React.FC = React.memo(() => {
         obj[token].decimal
       )
         // get the balance rounded up to 4 decimals
+      if (obj[token].decimal >= 4) {
       obj[token].fourDecimalsStringBalance = convertToDecimals(
         obj[token].balance,
         4
       )
+      } else {
+        obj[token].fourDecimalsStringBalance = convertToDecimals(
+          obj[token].balance,
+          obj[token].decimal
+        )
+      }
     }
     return obj
   }
 
+  // const fetchPrices = useCallback(async (query: any) => {
+  //   axios
+  //     .get(`http://localhost:3001/get-prices/${query}`)
+  //     .then((response) => {
+  //       // console.log("DATA+++++++++", response.data)
+  //       setPricesData(response.data)
+  //     })
+  //     .catch((error) => {
+  //       console.log(error)
+  //     })
+  // }, [])
   useEffect(() => {
     if (portfolioData) {
-      let copyWalletInfo = getWalletInformation
+      const copyWalletInfo = getWalletInformation
       if (copyWalletInfo) {
         const updatedWalletInfo = convertBalances(copyWalletInfo)
+
+        let priceQuery = ""
+        for (let asset in updatedWalletInfo) {
+          priceQuery += `${updatedWalletInfo[asset].chainContract},`
+        }
+        //use priceQuery here to call fetchPrices and get the response.data object. Then use the response.data from the API call to update updatedWalletInfo
         setPortfolioSummary(updatedWalletInfo)
       }
     }
