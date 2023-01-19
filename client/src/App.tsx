@@ -12,6 +12,7 @@ interface Asset {
   chainKey: string
   symbol: string
   imgSmall: string
+  decimal: number
 }
 
 interface Chain {
@@ -35,7 +36,8 @@ const App: React.FC = React.memo(() => {
       chainKey: string
       balance: number
       imgSmall: string
-      nonScientificStringBalance: string
+      decimal: number
+      fullStringBalance: string
       fourDecimalsStringBalance: string
     }
   }>({})
@@ -68,7 +70,8 @@ const App: React.FC = React.memo(() => {
         chainKey: string
         balance: any
         imgSmall: string
-        nonScientificStringBalance: null | string
+        decimal: number
+        fullStringBalance: null | string
         fourDecimalsStringBalance: null | string
       }
     } = {}
@@ -81,7 +84,8 @@ const App: React.FC = React.memo(() => {
             chainKey: chain.key,
             balance: asset.balance,
             imgSmall: asset.imgSmall,
-            nonScientificStringBalance: null,
+            decimal: asset.decimal,
+            fullStringBalance: null,
             fourDecimalsStringBalance: null,
           }
         } else {
@@ -93,30 +97,28 @@ const App: React.FC = React.memo(() => {
     return walletAssetInfo
   }, [portfolioData])
 
+  function convertToDecimals(num: number, decimal: number) {
+    // mathematically correctly convert and round numbers
+    const decimalNum = new Decimal(num)
+    return decimalNum
+      .mul(new Decimal(10).pow(decimal))
+      .floor()
+      .div(new Decimal(10).pow(decimal))
+      .toFixed(decimal)
+  }
+
   const convertBalances = (obj: any) => {
-    // this func converts scientific nums to regular nums
-    // also adds 'nonScientificStringBalance' &
-    // 'fourDecimalsStringBalance' to the object
-    // these values would be used to render Wallet Asses info
     for (let token in obj) {
-      // find if the num is a scientific number
-      let numString = obj[token].balance.toString()
-      let isAScientificNumber = numString.indexOf("e")
-      // add 'nonScientificStringBalance' & 'fourDecimalsStringBalance'
-      if (isAScientificNumber === -1) {
-        const fourDecimalsStringBalance = obj[token].balance.toFixed(4)
-        obj[token].nonScientificStringBalance = fourDecimalsStringBalance
-        obj[token].fourDecimalsStringBalance = fourDecimalsStringBalance
-      } else {
-        let decimalNum = new Decimal(obj[token].balance)
-        let decimalPlaces = decimalNum.decimalPlaces()
-        const nonScientificStringNumber = new Decimal(obj[token].balance)
-        new Decimal(obj[token].balance)
-        obj[token].nonScientificStringBalance =
-          nonScientificStringNumber.toFixed(decimalPlaces)
-        obj[token].fourDecimalsStringBalance =
-          nonScientificStringNumber.toFixed(4)
-      }
+      //get a full balance as a regular number as a string
+      obj[token].fullStringBalance = convertToDecimals(
+        obj[token].balance,
+        obj[token].decimal
+      )
+        // get the balance rounded up to 4 decimals
+      obj[token].fourDecimalsStringBalance = convertToDecimals(
+        obj[token].balance,
+        4
+      )
     }
     return obj
   }
@@ -149,14 +151,6 @@ const App: React.FC = React.memo(() => {
     return null
   }
 
-  if (!isLoading && error == null) {
-    // console.log(portfolioData)
-    // console.log(portfolioData.assetByProtocols.wallet.chains)
-    // Object.entries(portfolioData.assetByProtocols.wallet.chains).map(
-    //   ([key, value]) => console.log(value)
-    // )
-  }
-
   const AssetItem = ({
     iconAddress,
     tokenName,
@@ -184,10 +178,15 @@ const App: React.FC = React.memo(() => {
               Price
             </div>
           </div>
-          <div className="text-xs text-gray-600 dark:text-gray-200">
-            {fourDecimalsBalance}
+          <div>
+            <div className="text-gray-600 dark:text-gray-200 font-medium float-right">
+              price
+            </div>
+            <div className="text-xs text-gray-600 dark:text-gray-200">
+              {fourDecimalsBalance}
+            </div>
           </div>
-          <button className="flex justify-end w-24 text-right">
+          <button className="flex justify-end w-8 text-right">
             <svg
               width="12"
               fill="currentColor"
