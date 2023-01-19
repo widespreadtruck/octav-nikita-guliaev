@@ -14,6 +14,7 @@ interface Asset {
   imgSmall: string
   decimal: number
   chainContract: string
+  latestPrice: string | number
 }
 
 interface Chain {
@@ -44,6 +45,7 @@ const App: React.FC = React.memo(() => {
       chainContract: string
       fullStringBalance: string
       fourDecimalsStringBalance: string
+      latestPrice: string | number
     }
   }>({})
 
@@ -77,6 +79,7 @@ const App: React.FC = React.memo(() => {
         imgSmall: string
         decimal: number
         chainContract: string
+        latestPrice: string | number
         fullStringBalance: null | string
         fourDecimalsStringBalance: null | string
       }
@@ -94,6 +97,7 @@ const App: React.FC = React.memo(() => {
             chainContract: asset.chainContract,
             fullStringBalance: null,
             fourDecimalsStringBalance: null,
+            latestPrice: 'N/A',
           }
         } else {
           walletAssetInfo[asset.symbol].balance += asset.balance
@@ -148,6 +152,7 @@ const App: React.FC = React.memo(() => {
   //       console.log(error)
   //     })
   // }, [])
+
   useEffect(() => {
     if (portfolioData) {
       const copyWalletInfo = getWalletInformation
@@ -158,8 +163,34 @@ const App: React.FC = React.memo(() => {
         for (let asset in updatedWalletInfo) {
           priceQuery += `${updatedWalletInfo[asset].chainContract},`
         }
-        //use priceQuery here to call fetchPrices and get the response.data object. Then use the response.data from the API call to update updatedWalletInfo
-        setPortfolioSummary(updatedWalletInfo)
+        // console.log("===============", priceQuery)
+
+        axios
+          .get(`http://localhost:3001/get-prices/${priceQuery}`)
+          .then((response) => {
+            const assetPriceData = response.data.coins
+            // console.log("response.data+++++++++", assetPriceData)
+            // console.log("updatedWalletInfo+++++++++", updatedWalletInfo)
+            // setPricesData(response.data)
+
+            for (const key in assetPriceData) {
+              // console.log(assetPriceData[key].symbol.toUpperCase())
+              const symbol = assetPriceData[key].symbol.toUpperCase()
+              const price = assetPriceData[key].price
+              for (const walletKey in updatedWalletInfo) {
+                if (walletKey.toUpperCase() === symbol) {
+                  console.log('symbol', updatedWalletInfo[walletKey].symbol)
+                  console.log('price',price)
+                  updatedWalletInfo[walletKey].latestPrice = price
+                }
+              }
+            }
+            setPortfolioSummary(updatedWalletInfo)
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+
       }
     }
   }, [portfolioData, getWalletInformation])
@@ -186,10 +217,12 @@ const App: React.FC = React.memo(() => {
     iconAddress,
     tokenName,
     fourDecimalsBalance,
+    latestPrice,
   }: {
     iconAddress: string
     tokenName: string
     fourDecimalsBalance: string
+    latestPrice: string | number
   }) => {
     return (
       <li className="flex flex-row mb-2 border-gray-400">
@@ -206,12 +239,12 @@ const App: React.FC = React.memo(() => {
           <div className="flex-1 pl-1 md:mr-16">
             <div className="font-medium dark:text-white">{tokenName}</div>
             <div className="text-sm text-gray-600 dark:text-gray-200">
-              Price
+              {latestPrice !== 'N/A' ? `$${latestPrice}` : 'N/A'}
             </div>
           </div>
           <div>
             <div className="text-gray-600 dark:text-gray-200 font-medium float-right">
-              price
+              Balance
             </div>
             <div className="text-xs text-gray-600 dark:text-gray-200">
               {fourDecimalsBalance}
@@ -248,6 +281,7 @@ const App: React.FC = React.memo(() => {
                   iconAddress={value.imgSmall}
                   tokenName={value.symbol.toUpperCase()}
                   fourDecimalsBalance={value.fourDecimalsStringBalance}
+                  latestPrice={value.latestPrice}
                 />
               ))}
             </ul>
