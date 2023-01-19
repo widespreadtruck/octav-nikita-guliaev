@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react"
 import "./App.css"
 import axios from "axios"
+import { Decimal } from "decimal.js"
 
 interface Error {
   message: string
@@ -56,43 +57,74 @@ const App: React.FC = React.memo(() => {
     fetchData()
   }, [fetchData])
 
-  const calculateBalancesInWallet = useMemo(() => {
+  // function convertToRegularNumber(num: number) {
+  //   let numString = num.toString()
+  //   let eIndex = numString.indexOf("e")
+  //   if (eIndex === -1) return num
+  //   let exponent = parseInt(numString.slice(eIndex + 1))
+  //   let decimalPlaces = -exponent
+  //   let decimalNum = num.toFixed(decimalPlaces)
+  //   let zeroes = "0".repeat(decimalPlaces)
+  //   return Number("0." + zeroes + decimalNum.slice(2))
+  // }
+
+  const getWalletInformation = useMemo(() => {
     if (!portfolioData) return
 
-    const symbolTotals: {
+    const walletAssetInfo: {
       [key: string]: {
         symbol: string
         chainKey: string
-        balance: number
+        balance: any
         imgSmall: string
+        fullNumberBalance: null | string
       }
     } = {}
 
     Object.values(portfolioData).forEach((chain) => {
       chain.protocolPositions.WALLET.assets.forEach((asset) => {
-        if (!symbolTotals[asset.symbol]) {
-          symbolTotals[asset.symbol] = {
+        if (!walletAssetInfo[asset.symbol]) {
+          walletAssetInfo[asset.symbol] = {
             symbol: asset.symbol,
             chainKey: chain.key,
             balance: asset.balance,
             imgSmall: asset.imgSmall,
+            fullNumberBalance: null,
           }
         } else {
-          symbolTotals[asset.symbol].balance += asset.balance
+          walletAssetInfo[asset.symbol].balance += asset.balance
         }
       })
     })
-    return symbolTotals
+
+    return walletAssetInfo
   }, [portfolioData])
 
   useEffect(() => {
     if (portfolioData) {
-      const balances = calculateBalancesInWallet
-      if (balances) {
-        setPortfolioSummary(balances)
+      let copyWalletInfo = getWalletInformation
+      if (copyWalletInfo) {
+        for (let token in copyWalletInfo) {
+          // find the num of decimals places
+          let numString = copyWalletInfo[token].balance.toString()
+          let eIndex = numString.indexOf("e")
+          // add a new key to the asset info object
+          // representing a regular number
+          // in addition to a scientific number 
+          if (eIndex === -1) {
+            copyWalletInfo[token].fullNumberBalance =
+              copyWalletInfo[token].balance.toFixed(4)
+          } else {
+            let decimalPlaces = Math.abs(parseInt(numString.slice(eIndex + 1)))
+            copyWalletInfo[token].fullNumberBalance = new Decimal(
+              copyWalletInfo[token].balance
+            ).toFixed(40)
+          }
+        }
+        setPortfolioSummary(copyWalletInfo)
       }
     }
-  }, [portfolioData, calculateBalancesInWallet])
+  }, [portfolioData, getWalletInformation])
 
   console.log({ portfolioSummary })
 
