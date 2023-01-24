@@ -188,23 +188,6 @@
                   "uuid": "75a180e7-f0ba-41f3-b126-b5bd641f77ec"
                 },
                 {
-                  "balance": 22816,
-                  "chainContract": "ethereum:0xc9da518db3abdb90a82c4d1838b7cf9b0c945e7e",
-                  "chainKey": "ethereum",
-                  "contract": "0xc9da518db3abdb90a82c4d1838b7cf9b0c945e7e",
-                  "decimal": 18,
-                  "explorerUrl": "https://etherscan.io/token/0xc9da518db3abdb90a82c4d1838b7cf9b0c945e7e",
-                  "imgSmall": "https://images.octav.fi/tokens/small/NoImageAvailable_small.png",
-                  "imgLarge": "https://images.octav.fi/tokens/small/NoImageAvailable_small.png",
-                  "name": "(apord.site)",
-                  "openPnl": 0,
-                  "price": 0,
-                  "symbol": "this token holders can claim reward token. please",
-                  "totalCostBasis": 0,
-                  "value": 0,
-                  "uuid": "96f3ac44-763e-44f8-9999-4ac3347e22e3"
-                },
-                {
                   "balance": 518,
                   "chainContract": "ethereum:0x208a9c9d8e1d33a4f5b371bf1864aa125379ba1b",
                   "chainKey": "ethereum",

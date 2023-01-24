@@ -143,17 +143,6 @@ const App: React.FC = React.memo(() => {
     return obj
   }
 
-  // const fetchPrices = useCallback(async (query: any) => {
-  //   axios
-  //     .get(`http://localhost:3001/get-prices/${query}`)
-  //     .then((response) => {
-  //       // console.log("DATA+++++++++", response.data)
-  //       setPricesData(response.data)
-  //     })
-  //     .catch((error) => {
-  //       console.log(error)
-  //     })
-  // }, [])
 
   useEffect(() => {
     if (portfolioData) {
@@ -165,15 +154,11 @@ const App: React.FC = React.memo(() => {
         for (let asset in updatedWalletInfo) {
           priceQuery += `${updatedWalletInfo[asset].chainContract},`
         }
-        // console.log("===============", priceQuery)
 
         axios
           .get(`http://localhost:3001/get-prices/${priceQuery}`)
           .then((response) => {
             const assetPriceData = response.data.coins
-            // console.log("response.data+++++++++", assetPriceData)
-            // console.log("updatedWalletInfo+++++++++", updatedWalletInfo)
-            // setPricesData(response.data)
 
             for (const key in assetPriceData) {
               // console.log(assetPriceData[key].symbol.toUpperCase())
@@ -182,11 +167,8 @@ const App: React.FC = React.memo(() => {
               for (const walletKey in updatedWalletInfo) {
                 if (walletKey.toUpperCase() === symbol) {
                   const balance = updatedWalletInfo[walletKey].balance
-                  // console.log('symbol', updatedWalletInfo[walletKey].symbol)
-                  // console.log('price',price)
                   updatedWalletInfo[walletKey].latestPrice = price
                   updatedWalletInfo[walletKey].assetValue = price * balance
-                  // console.log(symbol, price, balance)
                 }
               }
             }
@@ -232,9 +214,7 @@ const App: React.FC = React.memo(() => {
   }) => {
     return (
       <li className="flex flex-row">
-        <div
-          className="border-solid border-x border-t border-b-0 border-gray-500 select-none cursor-pointer flex flex-1 items-center p-4 bg-item-custom-color wrapperDiv"
-        >
+        <div className="border-solid border-x border-t border-b-0 border-gray-500 select-none cursor-pointer flex flex-1 items-center p-4 bg-item-custom-color wrapperDiv">
           <div className="flex flex-col items-center justify-center w-10 h-10 mr-4">
             <div>
               <img
@@ -246,7 +226,7 @@ const App: React.FC = React.memo(() => {
           </div>
           <div className="flex-1 pl-1 md:mr-16">
             <div className="font-medium dark:text-white">{tokenName}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-200">
+            <div className="text-sm text-gray-200">
               {latestPrice}
               {/* {latestPrice !== "N/A" ? `$${latestPrice}` : "N/A"} */}
             </div>
@@ -294,9 +274,44 @@ const App: React.FC = React.memo(() => {
       {!portfolioSummary ? (
         <div>Loading...</div>
       ) : (
-        <div className="bg-zinc-900 p-6">
-          <div className="container flex flex-col items-center justify-center w-full mx-auto">
-            <ul className="flex flex-col divide-y-0 divide-gray-600">
+        <div className="bg-zinc-900 p-6 border-2 border-red-500">
+          <div className="container flex flex-col items-center justify-center mx-auto w-3/5">
+            
+            <div className="flex items-center py-4 w-full pb-10">
+              <div className="flex flex-col items-center justify-center w-10 h-10 mr-4">
+                <div>
+                  <img
+                    alt="profile"
+                    src="https://img.icons8.com/windows/344/ffffff/wallet.png"
+                    className="mx-auto object-cover rounded-full h-10 w-10 "
+                  />
+                </div>
+              </div>
+              <div className="flex-1 pl-1 md:mr-16">
+                <div className="text-sm text-gray-200">Wallet</div>
+                <div className="font-medium text-white">Total Balance</div>
+              </div>
+
+              <button className="flex self-start w-8 text-right">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  className="feather feather-x"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+
+            <ul className="flex flex-col divide-y-0 divide-gray-600 w-full">
               {Object.values(portfolioSummary).map((value, idx) => (
                 <AssetItem
                   key={value.symbol}
