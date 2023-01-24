@@ -274,7 +274,7 @@ const App: React.FC = React.memo(() => {
       {!portfolioSummary ? (
         <div>Loading...</div>
       ) : (
-        <div className="bg-zinc-900 p-6 border-2">
+        <div className="bg-zinc-900 p-6">
           <div className="container flex flex-col items-center justify-center mx-auto w-3/5">
             
             <div className="flex items-center py-4 w-full pb-10">
