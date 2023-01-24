@@ -15,6 +15,7 @@ interface Asset {
   decimal: number
   chainContract: string
   latestPrice: string | number
+  assetValue: string | number
 }
 
 interface Chain {
@@ -46,6 +47,7 @@ const App: React.FC = React.memo(() => {
       fullStringBalance: string
       fourDecimalsStringBalance: string
       latestPrice: string | number
+      assetValue: string | number
     }
   }>({})
 
@@ -80,6 +82,7 @@ const App: React.FC = React.memo(() => {
         decimal: number
         chainContract: string
         latestPrice: string | number
+        assetValue: string | number
         fullStringBalance: null | string
         fourDecimalsStringBalance: null | string
       }
@@ -97,7 +100,8 @@ const App: React.FC = React.memo(() => {
             chainContract: asset.chainContract,
             fullStringBalance: null,
             fourDecimalsStringBalance: null,
-            latestPrice: 'N/A',
+            latestPrice: "N/A",
+            assetValue: "N/A",
           }
         } else {
           walletAssetInfo[asset.symbol].balance += asset.balance
@@ -125,12 +129,12 @@ const App: React.FC = React.memo(() => {
         obj[token].balance,
         obj[token].decimal
       )
-        // get the balance rounded up to 4 decimals
+      // get the balance rounded up to 4 decimals
       if (obj[token].decimal >= 4) {
-      obj[token].fourDecimalsStringBalance = convertToDecimals(
-        obj[token].balance,
-        4
-      )
+        obj[token].fourDecimalsStringBalance = convertToDecimals(
+          obj[token].balance,
+          4
+        )
       } else {
         obj[token].fourDecimalsStringBalance = convertToDecimals(
           obj[token].balance,
@@ -179,9 +183,12 @@ const App: React.FC = React.memo(() => {
               const price = assetPriceData[key].price
               for (const walletKey in updatedWalletInfo) {
                 if (walletKey.toUpperCase() === symbol) {
-                  console.log('symbol', updatedWalletInfo[walletKey].symbol)
-                  console.log('price',price)
+                  const balance = updatedWalletInfo[walletKey].balance
+                  // console.log('symbol', updatedWalletInfo[walletKey].symbol)
+                  // console.log('price',price)
                   updatedWalletInfo[walletKey].latestPrice = price
+                  updatedWalletInfo[walletKey].assetValue = price * balance
+                  // console.log(symbol, price, balance)
                 }
               }
             }
@@ -190,7 +197,6 @@ const App: React.FC = React.memo(() => {
           .catch((error) => {
             console.log(error)
           })
-
       }
     }
   }, [portfolioData, getWalletInformation])
@@ -218,11 +224,13 @@ const App: React.FC = React.memo(() => {
     tokenName,
     fourDecimalsBalance,
     latestPrice,
+    assetValue,
   }: {
     iconAddress: string
     tokenName: string
     fourDecimalsBalance: string
     latestPrice: string | number
+    assetValue: string | number
   }) => {
     return (
       <li className="flex flex-row mb-2 border-gray-400">
@@ -239,17 +247,20 @@ const App: React.FC = React.memo(() => {
           <div className="flex-1 pl-1 md:mr-16">
             <div className="font-medium dark:text-white">{tokenName}</div>
             <div className="text-sm text-gray-600 dark:text-gray-200">
-              {latestPrice !== 'N/A' ? `$${latestPrice}` : 'N/A'}
+              {latestPrice}
+              {/* {latestPrice !== "N/A" ? `$${latestPrice}` : "N/A"} */}
             </div>
           </div>
-          <div>
-            <div className="text-gray-600 dark:text-gray-200 font-medium float-right">
-              Balance
+
+          <div className="grid justify-items-stretch">
+            <div className="text-gray-600 dark:text-gray-200 font-medium justify-self-end">
+              {assetValue}
             </div>
-            <div className="text-xs text-gray-600 dark:text-gray-200">
+            <div className="text-xs text-gray-600 dark:text-gray-200 justify-self-end">
               {fourDecimalsBalance}
             </div>
           </div>
+
           <button className="flex justify-end w-8 text-right">
             <svg
               width="12"
@@ -267,6 +278,17 @@ const App: React.FC = React.memo(() => {
     )
   }
 
+  const convertToCurr = (num: number, decimals: number | null) => {
+    const balance = Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: decimals || 2,
+    })
+    return balance.format(num)
+  }
+
+  // console.log(`Pounds: ${pounds.format(price)}`
+
   return (
     <>
       {!portfolioSummary ? (
@@ -281,7 +303,17 @@ const App: React.FC = React.memo(() => {
                   iconAddress={value.imgSmall}
                   tokenName={value.symbol.toUpperCase()}
                   fourDecimalsBalance={value.fourDecimalsStringBalance}
-                  latestPrice={value.latestPrice}
+                  // latestPrice={value.latestPrice}
+                  latestPrice={
+                    typeof value.latestPrice === "number"
+                      ? convertToCurr(value.latestPrice, value.decimal)
+                      : value.latestPrice
+                  }
+                  assetValue={
+                    typeof value.assetValue === "number"
+                      ? convertToCurr(value.assetValue, null)
+                      : value.assetValue
+                  }
                 />
               ))}
             </ul>
