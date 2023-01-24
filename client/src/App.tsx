@@ -33,8 +33,6 @@ interface Portfolio {
 
 const App: React.FC = React.memo(() => {
   const [portfolioData, setPortfolioData] = useState<Portfolio | null>(null)
-  const [pricesData, setPricesData] = useState<any>(null)
-  const [priceQuery, setPriceQuery] = useState<any>("")
 
   const [portfolioSummary, setPortfolioSummary] = useState<{
     [key: string]: {
@@ -233,8 +231,10 @@ const App: React.FC = React.memo(() => {
     assetValue: string | number
   }) => {
     return (
-      <li className="flex flex-row mb-2 border-gray-400">
-        <div className="shadow border select-none cursor-pointer bg-white dark:bg-gray-800 rounded-md flex flex-1 items-center p-4">
+      <li className="flex flex-row">
+        <div
+          className="border-solid border-x border-t border-b-0 border-gray-500 select-none cursor-pointer flex flex-1 items-center p-4 bg-item-custom-color wrapperDiv"
+        >
           <div className="flex flex-col items-center justify-center w-10 h-10 mr-4">
             <div>
               <img
@@ -294,10 +294,10 @@ const App: React.FC = React.memo(() => {
       {!portfolioSummary ? (
         <div>Loading...</div>
       ) : (
-        <div>
+        <div className="bg-zinc-900 p-6">
           <div className="container flex flex-col items-center justify-center w-full mx-auto">
-            <ul className="flex flex-col">
-              {Object.values(portfolioSummary).map((value) => (
+            <ul className="flex flex-col divide-y-0 divide-gray-600">
+              {Object.values(portfolioSummary).map((value, idx) => (
                 <AssetItem
                   key={value.symbol}
                   iconAddress={value.imgSmall}
@@ -319,7 +319,7 @@ const App: React.FC = React.memo(() => {
             </ul>
           </div>
 
-          <pre>{JSON.stringify(portfolioData, null, 2)}</pre>
+          {/* <pre>{JSON.stringify(portfolioData, null, 2)}</pre> */}
         </div>
       )}
     </>
