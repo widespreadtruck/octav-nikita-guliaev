@@ -61,9 +61,6 @@ const App: React.FC = React.memo(() => {
     } catch (err: any) {
       setError({ message: err.message })
     }
-    // finally {
-    //   setIsLoading(false)
-    // }
   }, [])
 
   useEffect(() => {
@@ -179,9 +176,6 @@ const App: React.FC = React.memo(() => {
           .catch((error) => {
             console.log(error)
           })
-        // finally {
-        //   setIsLoading(false)
-        // }
       }
     }
   }, [portfolioData, getWalletInformation])
@@ -223,7 +217,7 @@ const App: React.FC = React.memo(() => {
   }) => {
     return (
       <li className="flex flex-row">
-        <div className="border-solid border-x border-t border-b-0 border-gray-500 select-none cursor-pointer flex flex-1 items-center p-4 bg-item-custom-color wrapperDiv">
+        <div className="border-solid border-x border-t border-b-0 border-gray-500 select-none cursor-pointer flex flex-1 items-center p-4 bg-item-custom-color wrapperDiv hover:bg-hover-item-custom-color">
           <div className="flex flex-col items-center justify-center w-10 h-10 mr-4">
             <div>
               <img
@@ -237,7 +231,6 @@ const App: React.FC = React.memo(() => {
             <div className="font-medium dark:text-white">{tokenName}</div>
             <div className="text-sm text-gray-200">
               {latestPrice}
-              {/* {latestPrice !== "N/A" ? `$${latestPrice}` : "N/A"} */}
             </div>
           </div>
 
