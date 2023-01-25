@@ -1,14 +1,14 @@
-ul li:first-child .wrapperDiv {
+ul li:first-child .listItem {
   @apply rounded-t-lg;
 }
 
-ul li:last-child .wrapperDiv {
+ul li:last-child .listItem {
   @apply rounded-b-lg;
 }
-ul li:last-child .wrapperDiv {
+ul li:last-child .listItem {
   @apply border-b;
 }
-.wrapperDiv {
+.listItem {
   min-width: 500px;
   max-width: 1000px;
 }

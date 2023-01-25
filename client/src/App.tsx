@@ -1,8 +1,12 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react"
 import "./App.css"
 import axios from "axios"
-import { Decimal } from "decimal.js"
+import { convertToDecimals, convertToCurrency } from "./Utils/Utils"
 import Spinner from "./components/Spinner"
+import WalletAssetsList from "./components/WalletAssetsList/WalletAssetsList"
+import WalletHeader from "./components/WalletHeader/WalletHeader"
+import usePortfolioData from "./components/hooks/usePortfolioData"
+import * as S from "./App.styles"
 
 interface Error {
   message: string
@@ -32,40 +36,28 @@ interface Portfolio {
   [key: string]: Chain
 }
 
+interface PortfolioSummaryTypes {
+  [key: string]: {
+    symbol: string
+    chainKey: string
+    balance: number
+    imgSmall: string
+    decimal: number
+    chainContract: string
+    fullStringBalance: string
+    fourDecimalsStringBalance: string
+    latestPrice: string | number
+    assetValue: string | number
+  }
+}
+
 const App: React.FC = React.memo(() => {
-  const [portfolioData, setPortfolioData] = useState<Portfolio | null>(null)
+  const portfolioData = usePortfolioData()
 
-  const [portfolioSummary, setPortfolioSummary] = useState<{
-    [key: string]: {
-      symbol: string
-      chainKey: string
-      balance: number
-      imgSmall: string
-      decimal: number
-      chainContract: string
-      fullStringBalance: string
-      fourDecimalsStringBalance: string
-      latestPrice: string | number
-      assetValue: string | number
-    }
-  }>({})
-
-  const [isLoading, setIsLoading] = useState(false)
+  const [portfolioSummary, setPortfolioSummary] =
+    useState<PortfolioSummaryTypes>({})
+  const [isLoading, setIsLoading] = useState<Boolean>(true)
   const [error, setError] = useState<Error | null>(null)
-
-  const fetchData = useCallback(async () => {
-    setIsLoading(true)
-    try {
-      const response = await axios.get("/wallet")
-      setPortfolioData(response.data.assetByProtocols.wallet.chains)
-    } catch (err: any) {
-      setError({ message: err.message })
-    }
-  }, [])
-
-  useEffect(() => {
-    fetchData()
-  }, [fetchData])
 
   const getWalletInformation = useMemo(() => {
     if (!portfolioData) return
@@ -108,16 +100,6 @@ const App: React.FC = React.memo(() => {
 
     return walletAssetInfo
   }, [portfolioData])
-
-  function convertToDecimals(num: number, decimal: number) {
-    // mathematically correctly convert and round numbers
-    const decimalNum = new Decimal(num)
-    return decimalNum
-      .mul(new Decimal(10).pow(decimal))
-      .floor()
-      .div(new Decimal(10).pow(decimal))
-      .toFixed(decimal)
-  }
 
   const convertBalances = (obj: any) => {
     for (let token in obj) {
@@ -174,170 +156,37 @@ const App: React.FC = React.memo(() => {
             setIsLoading(false)
           })
           .catch((error) => {
-            console.log(error)
+            setError(error)
           })
       }
     }
   }, [portfolioData, getWalletInformation])
 
-  console.log({ portfolioSummary })
+  // console.log({ portfolioSummary })
 
   if (isLoading) {
     return (
-      <div className="bg-zinc-900 p-6 h-screen w-screen flex items-center justify-center">
-          <Spinner />
-      </div>
+      <S.Container>
+        <Spinner />
+      </S.Container>
     )
   }
 
   if (error) {
     return (
-      <div>
-        <p>An error occurred: {error.message}</p>
-      </div>
+      <S.Container>
+        <p>An error occurred: {error.message}. Please call our Support.</p>
+      </S.Container>
     )
   }
-
-  if (!portfolioData) {
-    return null
-  }
-
-  const AssetItem = ({
-    iconAddress,
-    tokenName,
-    fourDecimalsBalance,
-    latestPrice,
-    assetValue,
-  }: {
-    iconAddress: string
-    tokenName: string
-    fourDecimalsBalance: string
-    latestPrice: string | number
-    assetValue: string | number
-  }) => {
-    return (
-      <li className="flex flex-row">
-        <div className="border-solid border-x border-t border-b-0 border-gray-500 select-none cursor-pointer flex flex-1 items-center p-4 bg-item-custom-color wrapperDiv hover:bg-hover-item-custom-color">
-          <div className="flex flex-col items-center justify-center w-10 h-10 mr-4">
-            <div>
-              <img
-                alt="profile"
-                src={iconAddress}
-                className="mx-auto object-cover rounded-full h-10 w-10 "
-              />
-            </div>
-          </div>
-          <div className="flex-1 pl-1 md:mr-16">
-            <div className="font-medium dark:text-white">{tokenName}</div>
-            <div className="text-sm text-gray-200">
-              {latestPrice}
-            </div>
-          </div>
-
-          <div className="grid justify-items-stretch">
-            <div className="text-gray-600 dark:text-gray-200 font-medium justify-self-end">
-              {assetValue}
-            </div>
-            <div className="text-xs text-gray-600 dark:text-gray-200 justify-self-end">
-              {fourDecimalsBalance}
-            </div>
-          </div>
-
-          <button className="flex justify-end w-8 text-right">
-            <svg
-              width="12"
-              fill="currentColor"
-              height="12"
-              className="text-gray-500 hover:text-gray-800 dark:hover:text-white dark:text-gray-200"
-              viewBox="0 0 1792 1792"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M1363 877l-742 742q-19 19-45 19t-45-19l-166-166q-19-19-19-45t19-45l531-531-531-531q-19-19-19-45t19-45l166-166q19-19 45-19t45 19l742 742q19 19 19 45t-19 45z"></path>
-            </svg>
-          </button>
-        </div>
-      </li>
-    )
-  }
-
-  const convertToCurr = (num: number, decimals: number | null) => {
-    const balance = Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      maximumFractionDigits: decimals || 2,
-    })
-    return balance.format(num)
-  }
-
-  // console.log(`Pounds: ${pounds.format(price)}`
 
   return (
-    <div className="bg-zinc-900 p-6">
-      <div className="container flex flex-col items-center justify-center mx-auto w-3/5 wrapperDiv">
-        <div className="flex items-center py-4 w-full pb-10">
-          {/* <div className="flex items-center justify-center mr-4">
-                <img
-                  alt="profile"
-                  src="https://img.icons8.com/windows/344/ffffff/wallet.png"
-                  className="object-cover rounded-full h-10 w-10 "
-                />
-              </div> */}
-
-          <div className="relative h-10 w-10 mr-4 flex items-center justify-center">
-            <img
-              src="https://img.icons8.com/windows/344/ffffff/wallet.png"
-              className="absolute object-cover h-7 w-7 "
-            />
-            <div className="absolute inset-0 flex items-center justify-center bg-purple-500 opacity-50 rounded-full"></div>
-          </div>
-
-          <div className="flex-1 pl-1 md:mr-16">
-            <div className="text-sm text-gray-200">Wallet</div>
-            <div className="font-medium text-white">Total Balance</div>
-          </div>
-
-          <button className="flex self-start w-8 text-right">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              className="feather feather-x"
-            >
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
-
-        <ul className="flex flex-col divide-y-0 divide-gray-600 w-full">
-          {Object.values(portfolioSummary).map((value, idx) => (
-            <AssetItem
-              key={value.symbol}
-              iconAddress={value.imgSmall}
-              tokenName={value.symbol.toUpperCase()}
-              fourDecimalsBalance={value.fourDecimalsStringBalance}
-              // latestPrice={value.latestPrice}
-              latestPrice={
-                typeof value.latestPrice === "number"
-                  ? convertToCurr(value.latestPrice, value.decimal)
-                  : value.latestPrice
-              }
-              assetValue={
-                typeof value.assetValue === "number"
-                  ? convertToCurr(value.assetValue, null)
-                  : value.assetValue
-              }
-            />
-          ))}
-        </ul>
-      </div>
-    </div>
+    <S.Content>
+      <S.InnerWrapper className="listItem">
+        <WalletHeader />
+        <WalletAssetsList portfolioSummaryData={portfolioSummary} />
+      </S.InnerWrapper>
+    </S.Content>
   )
 })
 
