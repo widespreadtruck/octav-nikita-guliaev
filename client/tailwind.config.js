@@ -4,9 +4,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'item-custom-color': "#333838",
+        "item-custom-color": "#333838",
       },
     },
+  },
+  variants: {
+    width: ["responsive"],
+    height: ["responsive"],
+    margin: ["responsive"],
   },
   plugins: [],
 }

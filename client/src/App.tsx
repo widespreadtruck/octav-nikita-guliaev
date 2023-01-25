@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react"
 import "./App.css"
 import axios from "axios"
 import { Decimal } from "decimal.js"
+import Spinner from "./components/Spinner"
 
 interface Error {
   message: string
@@ -59,9 +60,10 @@ const App: React.FC = React.memo(() => {
       setPortfolioData(response.data.assetByProtocols.wallet.chains)
     } catch (err: any) {
       setError({ message: err.message })
-    } finally {
-      setIsLoading(false)
     }
+    // finally {
+    //   setIsLoading(false)
+    // }
   }, [])
 
   useEffect(() => {
@@ -143,7 +145,6 @@ const App: React.FC = React.memo(() => {
     return obj
   }
 
-
   useEffect(() => {
     if (portfolioData) {
       const copyWalletInfo = getWalletInformation
@@ -173,10 +174,14 @@ const App: React.FC = React.memo(() => {
               }
             }
             setPortfolioSummary(updatedWalletInfo)
+            setIsLoading(false)
           })
           .catch((error) => {
             console.log(error)
           })
+        // finally {
+        //   setIsLoading(false)
+        // }
       }
     }
   }, [portfolioData, getWalletInformation])
@@ -184,7 +189,11 @@ const App: React.FC = React.memo(() => {
   console.log({ portfolioSummary })
 
   if (isLoading) {
-    return <p>Loading...</p>
+    return (
+      <div className="bg-zinc-900 p-6 h-screen w-screen flex items-center justify-center">
+          <Spinner />
+      </div>
+    )
   }
 
   if (error) {
@@ -270,74 +279,72 @@ const App: React.FC = React.memo(() => {
   // console.log(`Pounds: ${pounds.format(price)}`
 
   return (
-    <>
-      {!portfolioSummary ? (
-        <div>Loading...</div>
-      ) : (
-        <div className="bg-zinc-900 p-6">
-          <div className="container flex flex-col items-center justify-center mx-auto w-3/5">
-            
-            <div className="flex items-center py-4 w-full pb-10">
-              <div className="flex flex-col items-center justify-center w-10 h-10 mr-4">
-                <div>
-                  <img
-                    alt="profile"
-                    src="https://img.icons8.com/windows/344/ffffff/wallet.png"
-                    className="mx-auto object-cover rounded-full h-10 w-10 "
-                  />
-                </div>
-              </div>
-              <div className="flex-1 pl-1 md:mr-16">
-                <div className="text-sm text-gray-200">Wallet</div>
-                <div className="font-medium text-white">Total Balance</div>
-              </div>
-
-              <button className="flex self-start w-8 text-right">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  className="feather feather-x"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-            </div>
-
-            <ul className="flex flex-col divide-y-0 divide-gray-600 w-full">
-              {Object.values(portfolioSummary).map((value, idx) => (
-                <AssetItem
-                  key={value.symbol}
-                  iconAddress={value.imgSmall}
-                  tokenName={value.symbol.toUpperCase()}
-                  fourDecimalsBalance={value.fourDecimalsStringBalance}
-                  // latestPrice={value.latestPrice}
-                  latestPrice={
-                    typeof value.latestPrice === "number"
-                      ? convertToCurr(value.latestPrice, value.decimal)
-                      : value.latestPrice
-                  }
-                  assetValue={
-                    typeof value.assetValue === "number"
-                      ? convertToCurr(value.assetValue, null)
-                      : value.assetValue
-                  }
+    <div className="bg-zinc-900 p-6">
+      <div className="container flex flex-col items-center justify-center mx-auto w-3/5 wrapperDiv">
+        <div className="flex items-center py-4 w-full pb-10">
+          {/* <div className="flex items-center justify-center mr-4">
+                <img
+                  alt="profile"
+                  src="https://img.icons8.com/windows/344/ffffff/wallet.png"
+                  className="object-cover rounded-full h-10 w-10 "
                 />
-              ))}
-            </ul>
+              </div> */}
+
+          <div className="relative h-10 w-10 mr-4 flex items-center justify-center">
+            <img
+              src="https://img.icons8.com/windows/344/ffffff/wallet.png"
+              className="absolute object-cover h-7 w-7 "
+            />
+            <div className="absolute inset-0 flex items-center justify-center bg-purple-500 opacity-50 rounded-full"></div>
           </div>
 
-          {/* <pre>{JSON.stringify(portfolioData, null, 2)}</pre> */}
+          <div className="flex-1 pl-1 md:mr-16">
+            <div className="text-sm text-gray-200">Wallet</div>
+            <div className="font-medium text-white">Total Balance</div>
+          </div>
+
+          <button className="flex self-start w-8 text-right">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              className="feather feather-x"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
-      )}
-    </>
+
+        <ul className="flex flex-col divide-y-0 divide-gray-600 w-full">
+          {Object.values(portfolioSummary).map((value, idx) => (
+            <AssetItem
+              key={value.symbol}
+              iconAddress={value.imgSmall}
+              tokenName={value.symbol.toUpperCase()}
+              fourDecimalsBalance={value.fourDecimalsStringBalance}
+              // latestPrice={value.latestPrice}
+              latestPrice={
+                typeof value.latestPrice === "number"
+                  ? convertToCurr(value.latestPrice, value.decimal)
+                  : value.latestPrice
+              }
+              assetValue={
+                typeof value.assetValue === "number"
+                  ? convertToCurr(value.assetValue, null)
+                  : value.assetValue
+              }
+            />
+          ))}
+        </ul>
+      </div>
+    </div>
   )
 })
 

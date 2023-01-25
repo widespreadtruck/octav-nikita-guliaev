@@ -8,3 +8,9 @@ ul li:last-child .wrapperDiv {
 ul li:last-child .wrapperDiv {
   @apply border-b;
 }
+.wrapperDiv {
+  min-width: 500px;
+  max-width: 1000px;
+}
+
+
