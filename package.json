@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "serve": "node server/index.ts",
+    "server": "node server/index.ts",
+    "client": "cd ./client && npm run start",
     "watch": "tsc -w -p tsconfig.json",
     "build": "tsc -p tsconfig.json"
   },
