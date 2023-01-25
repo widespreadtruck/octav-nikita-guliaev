@@ -12,30 +12,6 @@ interface Error {
   message: string
 }
 
-interface Asset {
-  balance: number
-  chainKey: string
-  symbol: string
-  imgSmall: string
-  decimal: number
-  chainContract: string
-  latestPrice: string | number
-  assetValue: string | number
-}
-
-interface Chain {
-  key: string
-  protocolPositions: {
-    WALLET: {
-      assets: Asset[]
-    }
-  }
-}
-
-interface Portfolio {
-  [key: string]: Chain
-}
-
 interface PortfolioSummaryTypes {
   [key: string]: {
     symbol: string
@@ -51,6 +27,21 @@ interface PortfolioSummaryTypes {
   }
 }
 
+interface WalletAssetInfoTypes {
+  [key: string]: {
+    symbol: string
+    chainKey: string
+    balance: any
+    imgSmall: string
+    decimal: number
+    chainContract: string
+    latestPrice: string | number
+    assetValue: string | number
+    fullStringBalance: null | string
+    fourDecimalsStringBalance: null | string
+  }
+}
+
 const App: React.FC = React.memo(() => {
   const portfolioData = usePortfolioData()
 
@@ -60,22 +51,17 @@ const App: React.FC = React.memo(() => {
   const [error, setError] = useState<Error | null>(null)
 
   const getWalletInformation = useMemo(() => {
+    // this sums up all balances of the same token
+    // across different chains
+    // ie. ETH is on 3 diff chains, so we need to show ETH balance as a sum
+
+    // Also,
+    // this func adds more keys that would be used later
+    // ie. fullStringBalance (non-scientific num),
+    // or latestPrice, assetValue etc
     if (!portfolioData) return
 
-    const walletAssetInfo: {
-      [key: string]: {
-        symbol: string
-        chainKey: string
-        balance: any
-        imgSmall: string
-        decimal: number
-        chainContract: string
-        latestPrice: string | number
-        assetValue: string | number
-        fullStringBalance: null | string
-        fourDecimalsStringBalance: null | string
-      }
-    } = {}
+    const walletAssetInfo: WalletAssetInfoTypes = {}
 
     Object.values(portfolioData).forEach((chain) => {
       chain.protocolPositions.WALLET.assets.forEach((asset) => {
@@ -102,6 +88,9 @@ const App: React.FC = React.memo(() => {
   }, [portfolioData])
 
   const convertBalances = (obj: any) => {
+    // this func deals converts scientific nums to regular nums
+    // by using "convertToDecimals" which is using "decimal.js"
+    // to mathematically correctly convert and round the large nums
     for (let token in obj) {
       //get a full balance as a regular number as a string
       obj[token].fullStringBalance = convertToDecimals(
@@ -109,6 +98,7 @@ const App: React.FC = React.memo(() => {
         obj[token].decimal
       )
       // get the balance rounded up to 4 decimals
+      // or if there is 0 decimals, to round nums
       if (obj[token].decimal >= 4) {
         obj[token].fourDecimalsStringBalance = convertToDecimals(
           obj[token].balance,
@@ -131,17 +121,17 @@ const App: React.FC = React.memo(() => {
         const updatedWalletInfo = convertBalances(copyWalletInfo)
 
         let priceQuery = ""
+        // this gets the info required to create the query for the DefiLLama price API call
         for (let asset in updatedWalletInfo) {
           priceQuery += `${updatedWalletInfo[asset].chainContract},`
         }
 
         axios
-          .get(`http://localhost:3001/get-prices/${priceQuery}`)
+          .get(`/get-prices/${priceQuery}`)
           .then((response) => {
             const assetPriceData = response.data.coins
-
+            // add the Price data from DefiLlama to our object
             for (const key in assetPriceData) {
-              // console.log(assetPriceData[key].symbol.toUpperCase())
               const symbol = assetPriceData[key].symbol.toUpperCase()
               const price = assetPriceData[key].price
               for (const walletKey in updatedWalletInfo) {
