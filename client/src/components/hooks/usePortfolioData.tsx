@@ -2,7 +2,11 @@ import { useState, useEffect, useCallback } from "react"
 import axios from "axios"
 
 interface Portfolio {
-  [key: string]: Chain
+  [key: string]: {
+    [key: string]: {
+      [key: string]: Chain
+    }
+  }
 }
 
 interface Chain {
@@ -31,7 +35,9 @@ const usePortfolioData = (): Portfolio | null => {
   const fetchData = useCallback(async () => {
     try {
       const response = await axios.get("/wallet")
-      setPortfolioData(response.data.assetByProtocols.wallet.chains)
+      // console.log(response.data.assetByProtocols)
+      setPortfolioData(response.data.assetByProtocols)
+      // setPortfolioData(response.data.assetByProtocols.wallet.chains)
     } catch (err: any) {
       console.log(`An error occurred: ${err.message}`)
     }

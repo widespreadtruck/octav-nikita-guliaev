@@ -1,5 +1,4 @@
 import tw from "twin.macro"
-import styled from "styled-components"
 
 export const ListElement = tw.li`
     flex flex-row
