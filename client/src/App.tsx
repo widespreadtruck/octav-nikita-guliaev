@@ -2,7 +2,8 @@ import React, { useEffect, useState, useCallback, useMemo } from "react"
 import "./App.css"
 import axios from "axios"
 import { convertToDecimals, convertToCurrency } from "./Utils/Utils"
-import Spinner from "./components/Spinner"
+import Spinner from "./components/Spinner/Spinner"
+import SkeletonLoader from "./components/SkeletonLoader/SkeletonLoader"
 import WalletAssetsList from "./components/WalletAssetsList/WalletAssetsList"
 import WalletHeader from "./components/WalletHeader/WalletHeader"
 import usePortfolioData from "./components/hooks/usePortfolioData"
@@ -157,7 +158,8 @@ const App: React.FC = React.memo(() => {
   if (isLoading) {
     return (
       <S.Container>
-        <Spinner />
+        {/* <Spinner /> */}
+        <SkeletonLoader />
       </S.Container>
     )
   }
