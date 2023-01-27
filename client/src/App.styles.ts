@@ -11,7 +11,6 @@ export const Container = tw.div`
 `
 export const Content = tw.div`
     bg-zinc-900 
-    p-6
 `
 export const InnerWrapper = tw.div`
     container
@@ -22,4 +21,3 @@ export const InnerWrapper = tw.div`
     mx-auto
     w-3/5
 `
-

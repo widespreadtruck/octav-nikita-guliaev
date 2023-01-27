@@ -1,7 +1,7 @@
 import tw from "twin.macro"
 
 export const Container = tw.div`
-    flex items-center py-4 w-full pb-10
+    flex items-center py-4 w-full pb-10 pt-10 
 `
 export const ImgWrapper = tw.div`
     relative h-10 w-10 mr-4 flex items-center justify-center

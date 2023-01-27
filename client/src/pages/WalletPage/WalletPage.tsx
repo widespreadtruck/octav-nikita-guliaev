@@ -176,7 +176,7 @@ const WalletPage: React.FC = React.memo(() => {
   return (
     <S.Content>
       <S.InnerWrapper className="listItem">
-        <WalletHeader />
+        {/* <WalletHeader /> */}
         <WalletAssetsList portfolioSummaryData={portfolioSummary} />
       </S.InnerWrapper>
     </S.Content>
