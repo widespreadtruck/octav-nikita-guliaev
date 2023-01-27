@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import * as S from "./AssetItem.styles"
 import ArrowIcon from "../../assets/ArrowIcon"
 import AssetInfoModal from "../AssetInfoModal/AssetInfoModal"
@@ -19,6 +19,7 @@ const AssetItem = ({
   assetValue: string | number
   handleModal: any
 }): JSX.Element => {
+
 
   return (
     <S.ListElement onClick={() => handleModal({tokenName, latestPrice})}>

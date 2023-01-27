@@ -8,25 +8,29 @@ import WalletAssetsList from "../../components/WalletAssetsList/WalletAssetsList
 import WalletHeader from "../../components/WalletHeader/WalletHeader"
 import usePortfolioData from "../../components/hooks/usePortfolioData"
 import * as S from "../../App.styles"
+import { useDispatch } from "react-redux"
+import { saveTotalWalletBalance } from "../../store/actions/saveTotalWalletBalance"
+import { useSelector } from "react-redux"
+import { RootState } from "../../store/index"
 
 interface Error {
   message: string
 }
 
-interface PortfolioSummaryTypes {
-  [key: string]: {
-    symbol: string
-    chainKey: string
-    balance: number
-    imgSmall: string
-    decimal: number
-    chainContract: string
-    fullStringBalance: string
-    fourDecimalsStringBalance: string
-    latestPrice: string | number
-    assetValue: string | number
-  }
-}
+// interface PortfolioSummaryTypes {
+//   [key: string]: {
+//     symbol: string
+//     chainKey: string
+//     balance: number
+//     imgSmall: string
+//     decimal: number
+//     chainContract: string
+//     fullStringBalance: string
+//     fourDecimalsStringBalance: string
+//     latestPrice: string | number
+//     assetValue: string | number
+//   }
+// }
 
 interface WalletAssetInfoTypes {
   [key: string]: {
@@ -45,9 +49,10 @@ interface WalletAssetInfoTypes {
 
 const WalletPage: React.FC = React.memo(() => {
   const portfolioData = usePortfolioData()
+  const dispatch = useDispatch()
 
   const [portfolioSummary, setPortfolioSummary] =
-    useState<PortfolioSummaryTypes>({})
+    useState<any>({})
   const [isLoading, setIsLoading] = useState<Boolean>(true)
   const [error, setError] = useState<Error | null>(null)
 
@@ -132,6 +137,7 @@ const WalletPage: React.FC = React.memo(() => {
           .get(`/get-prices/${priceQuery}`)
           .then((response) => {
             const assetPriceData = response.data.coins
+            let totalValue = 0
             // add the Price data from DefiLlama to our object
             for (const key in assetPriceData) {
               const symbol = assetPriceData[key].symbol.toUpperCase()
@@ -141,10 +147,27 @@ const WalletPage: React.FC = React.memo(() => {
                   const balance = updatedWalletInfo[walletKey].balance
                   updatedWalletInfo[walletKey].latestPrice = price
                   updatedWalletInfo[walletKey].assetValue = price * balance
+                  totalValue = totalValue + price * balance
                 }
               }
             }
-            setPortfolioSummary(updatedWalletInfo)
+
+            const convertedToCurrencyTotalValue = convertToCurrency(
+              totalValue,
+              2
+            )
+            // dispatch(saveTotalWalletBalance("your value"))
+
+            // console.log("WalletPage", updatedWalletInfo)
+            const upd = {
+              updatedWalletInfo,
+              convertedToCurrencyTotalValue,
+            }
+            // console.log('------------', upd)
+            // setPortfolioSummary(updatedWalletInfo)
+            setPortfolioSummary(upd)
+
+
             setIsLoading(false)
           })
           .catch((error) => {
@@ -153,8 +176,6 @@ const WalletPage: React.FC = React.memo(() => {
       }
     }
   }, [portfolioData, getWalletInformation])
-
-  // console.log({ portfolioSummary })
 
   if (isLoading) {
     return (
@@ -167,9 +188,9 @@ const WalletPage: React.FC = React.memo(() => {
 
   if (error) {
     return (
-      <S.Container>
+      <S.ErrorContainer>
         <p>An error occurred: {error.message}. Please call our Support.</p>
-      </S.Container>
+      </S.ErrorContainer>
     )
   }
 

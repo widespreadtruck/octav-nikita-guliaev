@@ -1,17 +1,17 @@
 import { configureStore } from "@reduxjs/toolkit"
-import todosReducer from "./reducers/todosReducer"
+import totalWalletBalanceReducer from "./reducers/totalWalletBalanceReducer"
 
-interface TodosState {
-  todos: { id: number; text: string }[]
+interface WalletBalanceState {
+  totalWalletBalance: string
 }
 
 export interface RootState {
-  todos: TodosState
+  totalWalletBalance: WalletBalanceState
 }
 
 const store = configureStore({
   reducer: {
-    todos: todosReducer,
+    totalWalletBalance: totalWalletBalanceReducer,
   },
 })
 

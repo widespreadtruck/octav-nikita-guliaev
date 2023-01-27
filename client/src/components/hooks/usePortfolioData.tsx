@@ -35,9 +35,7 @@ const usePortfolioData = (): Portfolio | null => {
   const fetchData = useCallback(async () => {
     try {
       const response = await axios.get("/wallet")
-      // console.log(response.data.assetByProtocols)
       setPortfolioData(response.data.assetByProtocols)
-      // setPortfolioData(response.data.assetByProtocols.wallet.chains)
     } catch (err: any) {
       console.log(`An error occurred: ${err.message}`)
     }
