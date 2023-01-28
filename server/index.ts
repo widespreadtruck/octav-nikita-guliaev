@@ -14,6 +14,11 @@ const PORT = process.env.PORT || 3001
 
 app.use(cors())
 
+app.get("/wallet/:itemSymbol", (req, res) => {
+  const { itemSymbol } = req.params
+  res.send(itemSymbol)
+})
+
 app.get("/wallet", (req, res) => {
   fs.readFile(WALLET_DATA, (err, data) => {
     if (err) throw err
@@ -22,11 +27,11 @@ app.get("/wallet", (req, res) => {
   })
 })
 
+
 app.get('/get-prices/:query', (req, res) => {
   const { query } = req.params
   axios.get(`https://coins.llama.fi/prices/current/${query}`)
     .then(response => {
-      // console.log('response', response)
       res.send(response.data)
     })
     .catch(error => {

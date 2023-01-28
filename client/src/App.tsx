@@ -8,6 +8,7 @@ const App = () => {
   return (
     <Routes>
       {/* <Route path="/modal" element={<AssetInfoModal />} /> */}
+      <Route path="/wallet/:itemSymbol" element={<AssetInfoModal />} />
       <Route path="/wallet" element={<WalletPage />} />
       <Route path="/" element={<Navigate to="/wallet" />} />
       {/* <Route path="/wallet/ETH" element={<WalletPage />} /> */}

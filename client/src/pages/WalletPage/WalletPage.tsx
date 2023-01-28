@@ -35,6 +35,7 @@ interface Error {
 interface WalletAssetInfoTypes {
   [key: string]: {
     symbol: string
+    name: string
     chainKey: string
     balance: any
     imgSmall: string
@@ -75,6 +76,7 @@ const WalletPage: React.FC = React.memo(() => {
         if (!walletAssetInfo[asset.symbol]) {
           walletAssetInfo[asset.symbol] = {
             symbol: asset.symbol,
+            name: asset.name,
             chainKey: chain.key,
             balance: asset.balance,
             imgSmall: asset.imgSmall,

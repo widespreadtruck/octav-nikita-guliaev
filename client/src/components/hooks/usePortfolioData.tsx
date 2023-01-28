@@ -20,6 +20,7 @@ interface Chain {
 
 interface Asset {
   balance: number
+  name: string
   chainKey: string
   symbol: string
   imgSmall: string

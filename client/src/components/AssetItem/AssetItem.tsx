@@ -2,28 +2,30 @@ import React, { useState, useEffect } from "react"
 import * as S from "./AssetItem.styles"
 import ArrowIcon from "../../assets/ArrowIcon"
 import AssetInfoModal from "../AssetInfoModal/AssetInfoModal"
-// import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 
 const AssetItem = ({
   iconAddress,
+  symbol,
   tokenName,
   fourDecimalsBalance,
   latestPrice,
   assetValue,
-  handleModal,
 }: {
   iconAddress: string
+  symbol: string
   tokenName: string
   fourDecimalsBalance: string
   latestPrice: string | number
   assetValue: string | number
-  handleModal: any
 }): JSX.Element => {
-
+    const navigate = useNavigate()
+    const location = useLocation()
 
   return (
-    <S.ListElement onClick={() => handleModal({tokenName, latestPrice})}>
-      {/* <S.ListElement > */}
+    <S.ListElement
+      onClick={() => navigate(`${location.pathname}/${symbol}`)}
+    >
       <S.ContentWrapper className="listItem">
         <S.AssetImg>
           <S.Img alt="asset icon" src={iconAddress} />
