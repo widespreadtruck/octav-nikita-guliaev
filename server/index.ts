@@ -14,10 +14,6 @@ const PORT = process.env.PORT || 3001
 
 app.use(cors())
 
-app.get("/wallet/:itemSymbol", (req, res) => {
-  const { itemSymbol } = req.params
-  res.send(itemSymbol)
-})
 
 app.get("/wallet", (req, res) => {
   fs.readFile(WALLET_DATA, (err, data) => {
