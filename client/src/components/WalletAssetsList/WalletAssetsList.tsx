@@ -35,32 +35,17 @@ const WalletAssetsList = (
     setIsModalOpen(true)
     navigate(`${location.pathname}/#${data.tokenName}`)
   }
-  console.log("WalletAssetsList>>", portfolioSummaryData)
+  // console.log("WalletAssetsList>>", portfolioSummaryData)
 
   const assets = Object.values(
     portfolioSummaryData["portfolioSummaryData"]["updatedWalletInfo"]
   )
 
-
-
-
-  
   const totalWalletValue = 
     portfolioSummaryData["portfolioSummaryData"][
       "convertedToCurrencyTotalValue"
     ]
   
-  console.log("totalWalletValue>>", totalWalletValue)
-
-
-
-
-
-
-
-
-
-
   return (
     <>
       {isModalOpen ? (

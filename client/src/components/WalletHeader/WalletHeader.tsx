@@ -9,7 +9,7 @@ const WalletHeader = ({
 }: {
   totalWalletValue: string
 }): JSX.Element => {
-console.log('>>>>>>>',totalWalletValue)
+// console.log('>>>>>>>',totalWalletValue)
 
   return (
     <S.Container>
