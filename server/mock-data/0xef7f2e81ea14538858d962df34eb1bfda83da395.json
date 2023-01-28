@@ -769,7 +769,7 @@
                   "imgLarge": "https://images.octav.fi/tokens/large/0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664_large_icon.png",
                   "name": "usd coin avalanche bridged (usdc.e)",
                   "openPnl": 0,
-                  "price": 0,
+                  "price": 1,
                   "symbol": "usdc",
                   "totalCostBasis": 0,
                   "value": 0,

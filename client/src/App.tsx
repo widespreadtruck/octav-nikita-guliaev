@@ -10,7 +10,7 @@ const App = () => {
       {/* <Route path="/modal" element={<AssetInfoModal />} /> */}
       <Route path="/wallet" element={<WalletPage />} />
       <Route path="/" element={<Navigate to="/wallet" />} />
-      <Route path="/wallet/ETH" element={<WalletPage />} />
+      {/* <Route path="/wallet/ETH" element={<WalletPage />} /> */}
     </Routes>
   )
 }

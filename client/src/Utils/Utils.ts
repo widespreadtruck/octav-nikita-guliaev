@@ -10,7 +10,7 @@ export const convertToDecimals = (num: number, decimal: number) => {
     .toFixed(decimal)
 }
 
-  export const convertToCurrency = (num: number, decimals: number | null) => {
+  export const convertToCurrency = (num: any, decimals: number | null) => {
     const balance = Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",

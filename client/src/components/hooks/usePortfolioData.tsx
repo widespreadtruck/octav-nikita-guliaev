@@ -27,6 +27,7 @@ interface Asset {
   chainContract: string
   latestPrice: string | number
   assetValue: string | number
+  price: number
 }
 
 const usePortfolioData = (): Portfolio | null => {
