@@ -36,6 +36,9 @@ const WalletAssetsList = (
     navigate(`${location.pathname}/#${data.tokenName}`)
   }
   // console.log("WalletAssetsList>>", portfolioSummaryData)
+  const closeModal = () => {
+    setIsModalOpen(false)
+  }
 
   const assets = Object.values(
     portfolioSummaryData["portfolioSummaryData"]["updatedWalletInfo"]
@@ -49,7 +52,7 @@ const WalletAssetsList = (
   return (
     <>
       {isModalOpen ? (
-        <AssetInfoModal />
+        <AssetInfoModal closeModal={closeModal} />
       ) : (
         <>
           <WalletHeader totalWalletValue={totalWalletValue} />

@@ -8,7 +8,7 @@ import Spinner from "../Spinner/Spinner"
 import axios from "axios"
 import { convertToCurrency, convertToDecimals } from "../../Utils/Utils"
 
-const AssetInfoModal = () => {
+const AssetInfoModal = ({ closeModal }: { closeModal: () => void }) => {
   const portfolioData = usePortfolioData()
 
   const state = useSelector((state: RootState) => state)
@@ -20,14 +20,10 @@ const AssetInfoModal = () => {
   const location = useLocation()
   const assetSymbol = location.hash.slice(1)
 
-  // const fetchData = useCallback(async () => {
-  //   try {
-  //     const response = await axios.get("/wallet")
-  //     setPortfolioData(response.data.assetByProtocols)
-  //   } catch (err: any) {
-  //     console.log(`An error occurred: ${err.message}`)
-  //   }
-  // }, [])
+  const handleGoBack = () => {
+    window.history.back()
+    closeModal()
+  }
 
   useEffect(() => {
     if (!portfolioData) return
@@ -137,13 +133,39 @@ const AssetInfoModal = () => {
     // <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 z-50">
     //   <div className="relative mx-auto my-0 max-w-lg w-full">
     <div className="w-full h-screen px-4 py-6 bg-gray-800">
+        <button
+          onClick={handleGoBack}
+          type="button"
+          className=" group border border-gray-400 group-hover:text-gray-200 hover:border-gray-200 focus:ring-1 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm py-2.5 px-6 text-center inline-flex items-center mb-6 "
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            className="feather feather-arrow-left text-gray-400 group-hover:text-gray-200"
+          >
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <div className="text-gray-400 ml-2 group-hover:text-gray-200">
+            Back
+          </div>
+          <span className="sr-only">Go Back button</span>
+        </button>
+
       <div className="flex items-center justify-start">
+        <div className="text-4xl font-semibold w-max text-white mr-4">
+          {assetData.assetSymbol}
+        </div>
         <S.AssetImg>
           <S.Img alt="asset icon" src={assetData.assetsInfo[0].imgLarge} />
         </S.AssetImg>
-        <div className="text-4xl font-semibold w-max text-white">
-          {assetData.assetSymbol}
-        </div>
       </div>
 
       <div className="flex items-center justify-between my-6 space-x-2">
@@ -172,11 +194,12 @@ const AssetInfoModal = () => {
 
             <div
               className={
-                assetData.positiveReturn == null ? "text-white" : 
-                  assetData.positiveReturn ? "text-green-500" : "text-red-500"
-                
-                
-                }
+                assetData.positiveReturn == null
+                  ? "text-white"
+                  : assetData.positiveReturn
+                  ? "text-green-500"
+                  : "text-red-500"
+              }
               // className={
               //   assetData.positiveReturn ? "text-green-500" : "text-red-500"
               // }
@@ -187,7 +210,7 @@ const AssetInfoModal = () => {
         </div>
       </div>
 
-      <div className="text-white">
+      <div className="text-gray-200">
         <div className="flex items-center justify-between pb-2 mb-2 space-x-12 text-lg border-b border-gray-600 md:space-x-24">
           <p>Total Balance</p>
           <div className="flex items-end text-lg">
