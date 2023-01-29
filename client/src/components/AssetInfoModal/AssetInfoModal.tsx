@@ -1,11 +1,8 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react"
+import React, { useEffect, useState } from "react"
 import usePortfolioData from "../../components/hooks/usePortfolioData"
 import { useLocation } from "react-router-dom"
-import { RootState } from "../../store/index"
-import { useSelector, useDispatch } from "react-redux"
 import * as S from "./AssetInfoModal.styles"
 import Spinner from "../Spinner/Spinner"
-import WarningBanner from "../WarningBanner/WarningBanner"
 import axios from "axios"
 import { convertToCurrency, convertToDecimals } from "../../Utils/Utils"
 import useChainImages from "../hooks/useChainImages"
@@ -13,8 +10,6 @@ import useChainImages from "../hooks/useChainImages"
 const AssetInfoModal = () => {
   const portfolioData = usePortfolioData()
   const chainImages = useChainImages()
-
-  // console.log("useChainImages------>", chainImages)
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [assetData, setAssetData] = useState<any>({})
@@ -133,12 +128,12 @@ const AssetInfoModal = () => {
     )
   }
 
-  console.log("assetData", assetData)
+  // console.log("assetData", assetData)
 
   return (
-    <div className="w-full h-screen px-4 py-6 bg-zinc-900 flex flex-col items-center justify-start mx-auto">
+    <div className=" overflow-auto w-full h-screen px-4 py-6 bg-zinc-900 flex flex-col items-center justify-start mx-auto">
       <S.ListItem>
-        <div className="h-auto bg-gray-800 p-16 rounded-lg">
+        <div className="h-auto bg-gray-800 p-16 rounded-lg ">
           <button
             onClick={handleGoBack}
             type="button"
@@ -221,48 +216,6 @@ const AssetInfoModal = () => {
               </div>
             </div>
           </div>
-
-          {/* <div className="flex items-center justify-between mt-10 mb-8 space-x-2"> */}
-          {/* <p className="text-2xl font-bold text-white">Total Value</p> */}
-          {/* <div className="flex">
-              <div className="text-lg font-bold text-white mr-2">
-                {assetData.currentTotalValue}
-              </div>
-              <span className="flex items-center text-xl font-bold text-green-500">
-                {assetData.positiveReturn == null ? null : (
-                  <svg
-                    width="20"
-                    fill="currentColor"
-                    height="20"
-                    className={`h-4 ${
-                      assetData.positiveReturn
-                        ? "text-green-500"
-                        : "text-red-500 transform rotate-180"
-                    }`}
-                    viewBox="0 0 1792 1792"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M1675 971q0 51-37 90l-75 75q-38 38-91 38-54 0-90-38l-294-293v704q0 52-37.5 84.5t-90.5 32.5h-128q-53 0-90.5-32.5t-37.5-84.5v-704l-294 293q-36 38-90 38t-90-38l-75-75q-38-38-38-90 0-53 38-91l651-651q35-37 90-37 54 0 91 37l651 651q37 39 37 91z"></path>
-                  </svg>
-                )}
-
-                <div
-                  className={
-                    assetData.positiveReturn == null
-                      ? "text-white"
-                      : assetData.positiveReturn
-                      ? "text-green-500"
-                      : "text-red-500"
-                  }
-                >
-                  {assetData.openPnLPercentage == Infinity
-                    ? ""
-                    : `${assetData.openPnLPercentage}%`}
-                </div>
-              </span>
-            </div> */}
-          {/* </div> */}
-
           <div className="text-gray-200">
             <div className="flex items-center justify-between pb-2 mb-2 space-x-12 text-lg border-b border-gray-600 md:space-x-24">
               <p>Total Balance</p>
@@ -282,33 +235,13 @@ const AssetInfoModal = () => {
                 {assetData.purchasePrice}
               </div>
             </div>
-
-            {/* <div className="flex items-center justify-between pb-2 mb-2 space-x-12 text-sm border-b border-gray-200 md:space-x-24">
-          <p>Embedded form</p>
-          <div className="flex items-end text-xs">
-            13
-            <span className="flex items-center">
-              <svg
-                width="20"
-                fill="currentColor"
-                height="20"
-                className="h-3 text-green-500"
-                viewBox="0 0 1792 1792"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M1675 971q0 51-37 90l-75 75q-38 38-91 38-54 0-90-38l-294-293v704q0 52-37.5 84.5t-90.5 32.5h-128q-53 0-90.5-32.5t-37.5-84.5v-704l-294 293q-36 38-90 38t-90-38l-75-75q-38-38-38-90 0-53 38-91l651-651q35-37 90-37 54 0 91 37l651 651q37 39 37 91z"></path>
-              </svg>
-              12%
-            </span>
           </div>
-        </div> */}
-          </div>
+          
           <div>
-            <ul className="my-10 flex flex-col divide-y-0 divide-gray-600 w-full">
+            <ul className="mt-10 flex flex-col divide-y-0 divide-gray-600 w-full">
               {assetData.assetsInfo.map((value: any, idx: number) => (
                 <S.ListElement key={`${value.symbol}_${idx}`}>
                   <S.ContentWrapper className="listItem">
-                    {/* <div>{value.chainKey}</div> */}
                     <S.AssetImg>
                       <S.Img alt="chain icon" src={value.chainImg} />
                     </S.AssetImg>
@@ -320,7 +253,6 @@ const AssetInfoModal = () => {
                     </S.NameAndPriceWrapper>
 
                     <S.ValueAndBalance>
-                      {/* <S.AssetValue>Total Value</S.AssetValue> */}
                       <S.AssetValue>{value.name}</S.AssetValue>
                       <S.Balance>
                         {convertToCurrency(
@@ -331,25 +263,6 @@ const AssetInfoModal = () => {
                     </S.ValueAndBalance>
                   </S.ContentWrapper>
                 </S.ListElement>
-
-                // <AssetItem
-                //   triggerWarning={setShowMessage}
-                //   key={`${idx}_${value.symbol}`}
-                //   iconAddress={value.imgSmall}
-                //   tokenName={value.symbol.toUpperCase()}
-                //   symbol={value.symbol}
-                //   fourDecimalsBalance={value.fourDecimalsStringBalance}
-                //   latestPrice={
-                //     typeof value.latestPrice === "number"
-                //       ? convertToCurrency(value.latestPrice, value.decimal)
-                //       : value.latestPrice
-                //   }
-                //   assetValue={
-                //     typeof value.assetValue === "number"
-                //       ? convertToCurrency(value.assetValue, null)
-                //       : value.assetValue
-                //   }
-                // />
               ))}
             </ul>
           </div>

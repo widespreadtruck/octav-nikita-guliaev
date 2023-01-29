@@ -1,16 +1,12 @@
-import React, { useEffect } from "react"
+import React from "react"
 import * as S from "./WalletHeader.styles"
 import CloseIcon from "../../assets/CloseIcon"
-import { useSelector } from "react-redux"
-import { RootState } from "../../store/index"
 
 const WalletHeader = ({
   totalWalletValue,
 }: {
   totalWalletValue: string
 }): JSX.Element => {
-// console.log('>>>>>>>',totalWalletValue)
-
   return (
     <S.Container>
       <S.ImgWrapper>

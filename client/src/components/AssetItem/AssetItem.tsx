@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react"
+import React from "react"
 import * as S from "./AssetItem.styles"
 import ArrowIcon from "../../assets/ArrowIcon"
 import { useLocation, useNavigate } from "react-router-dom"
-import WarningBanner from "../WarningBanner/WarningBanner"
 
 const AssetItem = ({
   iconAddress,
@@ -21,18 +20,12 @@ const AssetItem = ({
   assetValue: string | number
   triggerWarning: any
 }): JSX.Element => {
-  const [showMessage, setShowMessage] = useState<boolean>(false)
-
   const navigate = useNavigate()
   const location = useLocation()
 
   const handleClick = (symbol: string, latestPrice: string | number) => {
     if (latestPrice === "N/A") {
       triggerWarning(true)
-      // setShowMessage(true)
-      // setTimeout(() => {
-      //   setShowMessage(false)
-      // }, 3000)
       return
     }
 
@@ -40,8 +33,6 @@ const AssetItem = ({
   }
 
   return (
-    <>
-      {/* {showMessage && <WarningBanner status={showMessage} />} */}
       <S.ListElement onClick={() => handleClick(symbol, latestPrice)}>
         <S.ContentWrapper className="listItem">
           <S.AssetImg>
@@ -62,7 +53,6 @@ const AssetItem = ({
           </S.ArrowBtn>
         </S.ContentWrapper>
       </S.ListElement>
-    </>
   )
 }
 

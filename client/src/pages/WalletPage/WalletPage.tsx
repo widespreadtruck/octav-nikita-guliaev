@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react"
+import React, { useEffect, useState, useMemo } from "react"
 import "../../App.css"
 import axios from "axios"
 import {
@@ -6,16 +6,11 @@ import {
   convertToCurrency,
   removeSpaces,
 } from "../../Utils/Utils"
-import Spinner from "../../components/Spinner/Spinner"
 import SkeletonLoader from "../../components/SkeletonLoader/SkeletonLoader"
 import WalletAssetsList from "../../components/WalletAssetsList/WalletAssetsList"
-import WalletHeader from "../../components/WalletHeader/WalletHeader"
 import usePortfolioData from "../../components/hooks/usePortfolioData"
 import * as S from "../../App.styles"
 import { useDispatch } from "react-redux"
-import { saveTotalWalletBalance } from "../../store/actions/saveTotalWalletBalance"
-import { useSelector } from "react-redux"
-import { RootState } from "../../store/index"
 
 interface Error {
   message: string
@@ -75,7 +70,6 @@ const WalletPage: React.FC = React.memo(() => {
     const walletAssetInfo: WalletAssetInfoTypes = {}
 
     Object.values(portfolioData.wallet.chains).forEach((chain) => {
-      // console.log("portfolioData", portfolioData)
       chain.protocolPositions.WALLET.assets.forEach((asset) => {
         if (!walletAssetInfo[asset.symbol]) {
           walletAssetInfo[asset.symbol] = {
@@ -162,15 +156,10 @@ console.log(walletAssetInfo)
               totalValue,
               2
             )
-            // dispatch(saveTotalWalletBalance("your value"))
-
-            // console.log("WalletPage", updatedWalletInfo)
             const upd = {
               updatedWalletInfo,
               convertedToCurrencyTotalValue,
             }
-            // console.log('------------', upd)
-            // setPortfolioSummary(updatedWalletInfo)
             setPortfolioSummary(upd)
 
 
@@ -203,7 +192,6 @@ console.log(walletAssetInfo)
   return (
     <S.Content>
       <S.InnerWrapper className="listItem">
-        {/* <WalletHeader /> */}
         <WalletAssetsList portfolioSummaryData={portfolioSummary} />
       </S.InnerWrapper>
     </S.Content>

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react"
 import AssetItem from "../AssetItem/AssetItem"
 import { convertToCurrency } from "../../Utils/Utils"
-import { useLocation, useNavigate } from "react-router-dom"
-import AssetInfoModal from "../AssetInfoModal/AssetInfoModal"
 import WalletHeader from "../WalletHeader/WalletHeader"
 import "../../App.css"
 import WarningBanner from "../WarningBanner/WarningBanner"
@@ -41,7 +39,6 @@ const WalletAssetsList = (portfolioSummaryData: any): JSX.Element => {
        return typeof a.assetValue === "number" ? -1 : 1
      }
   })
-// console.log(sortedAssets)
 
   const totalWalletValue =
     portfolioSummaryData["portfolioSummaryData"][
