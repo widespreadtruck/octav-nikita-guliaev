@@ -12,13 +12,6 @@ const WarningBanner = ({ status }: { status: boolean }) => {
       className="fixed top-0 right-0 p-4"
       role="alert"
     >
-      {/* <div className="bg-red-200 border-red-600 text-red-600 border-l-4 p-4">
-        <p className="font-bold">Warning</p>
-        <p>
-          Sorry... The Price data is currently unavailable for this asset. Try
-          later.
-        </p>
-      </div> */}
       <div className="flex bg-red-100 rounded-lg p-4 mb-4">
         <svg
           className="w-5 h-5 text-red-700"
