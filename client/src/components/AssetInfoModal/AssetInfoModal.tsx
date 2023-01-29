@@ -8,16 +8,13 @@ import Spinner from "../Spinner/Spinner"
 import WarningBanner from "../WarningBanner/WarningBanner"
 import axios from "axios"
 import { convertToCurrency, convertToDecimals } from "../../Utils/Utils"
-import styled from "styled-components"
-
-const ListItem = styled.div`
-  min-width: 700px;
-  max-width: 1000px;
-  width: 80%;
-`
+import useChainImages from "../hooks/useChainImages"
 
 const AssetInfoModal = () => {
   const portfolioData = usePortfolioData()
+  const chainImages = useChainImages()
+
+  // console.log("useChainImages------>", chainImages)
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [assetData, setAssetData] = useState<any>({})
@@ -59,6 +56,18 @@ const AssetInfoModal = () => {
       })
     })
 
+    //add chain images to each asset
+    if (chainImages) {
+      assetsInfo.map((asset: any) => {
+        Object.values(chainImages).forEach((chain: any) => {
+          if (asset.chainKey === chain.key) {
+            asset.chainImg = chain.imgLarge
+            asset.chainName = chain.name
+          }
+        })
+      })
+    }
+
     if (query.length !== 0) {
       try {
         axios.get(`/get-prices/${query}`).then((res) => {
@@ -66,7 +75,6 @@ const AssetInfoModal = () => {
 
           let currPrice: number = 0
           Object.values(coin).forEach((obj: any) => {
-            console.log(coin)
             currPrice = obj.price
           })
 
@@ -76,7 +84,6 @@ const AssetInfoModal = () => {
             ((currentTotalValue - totalValueAtPurchase) /
               totalValueAtPurchase) *
             100
-          console.log(openPnL)
 
           if (openPnL > 0) {
             positiveReturn = true
@@ -98,6 +105,7 @@ const AssetInfoModal = () => {
             totalBalance: convertToDecimals(totalBalance, decimal),
             purchasePrice: convertToCurrency(purchasePrice, decimal),
             currPrice: convertToCurrency(currPrice, decimal),
+            notConvertedCurrPrice: currPrice,
             currentTotalValue: convertToCurrency(
               currentTotalValueToDecimals,
               decimal
@@ -114,7 +122,7 @@ const AssetInfoModal = () => {
         console.log(`An error occurred: ${err.message}`)
       }
     }
-  }, [portfolioData])
+  }, [portfolioData, chainImages])
 
   if (isLoading) {
     return (
@@ -129,12 +137,12 @@ const AssetInfoModal = () => {
 
   return (
     <div className="w-full h-screen px-4 py-6 bg-zinc-900 flex flex-col items-center justify-start mx-auto">
-      <ListItem>
+      <S.ListItem>
         <div className="h-auto bg-gray-800 p-16 rounded-lg">
           <button
             onClick={handleGoBack}
             type="button"
-            className="group border border-gray-400 group-hover:text-gray-200 hover:border-gray-200 focus:ring-1 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm py-2.5 px-6 text-center inline-flex items-center mb-6 "
+            className="group border border-gray-400 group-hover:text-gray-200 hover:border-gray-200 focus:ring-1 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm py-2.5 px-6 text-center inline-flex items-center mb-1"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -157,26 +165,66 @@ const AssetInfoModal = () => {
             <span className="sr-only">Go Back button</span>
           </button>
 
-          <div className="flex items-center justify-between mt-4">
+          <div className="flex items-center justify-between my-10">
             <div className="flex items-center justify-start">
-              <div className="text-4xl font-semibold w-max text-white mr-4">
-                {assetData.assetSymbol}
-              </div>
-              <S.AssetImg>
+              <S.SymbolImg>
                 <S.Img
                   alt="asset icon"
                   src={assetData.assetsInfo[0].imgLarge}
                 />
-              </S.AssetImg>
+              </S.SymbolImg>
+              <div className="text-5xl font-semibold w-max text-white mr-4">
+                {assetData.assetSymbol}
+              </div>
             </div>
-            <div className="text-4xl font-semibold w-max text-white text-right">
-              {assetData.name}
+
+            <div className="flex flex-col items-end justify-center">
+              <div className="text-lg font-semibold text-gray-200 text-right mb-1">
+                TOTAL VALUE
+              </div>
+              <div className="flex">
+                <div className="text-2xl font-bold text-white mr-2 text-right">
+                  {assetData.currentTotalValue}
+                </div>
+                <span className="flex items-center text-2xl font-bold text-green-500">
+                  {assetData.positiveReturn == null ? null : (
+                    <svg
+                      width="20"
+                      fill="currentColor"
+                      height="20"
+                      className={`h-5 mr-1 ${
+                        assetData.positiveReturn
+                          ? "text-green-500"
+                          : "text-red-500 transform rotate-180"
+                      }`}
+                      viewBox="0 0 1792 1792"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M1675 971q0 51-37 90l-75 75q-38 38-91 38-54 0-90-38l-294-293v704q0 52-37.5 84.5t-90.5 32.5h-128q-53 0-90.5-32.5t-37.5-84.5v-704l-294 293q-36 38-90 38t-90-38l-75-75q-38-38-38-90 0-53 38-91l651-651q35-37 90-37 54 0 91 37l651 651q37 39 37 91z"></path>
+                    </svg>
+                  )}
+
+                  <div
+                    className={
+                      assetData.positiveReturn == null
+                        ? "text-white"
+                        : assetData.positiveReturn
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }
+                  >
+                    {assetData.openPnLPercentage == Infinity
+                      ? ""
+                      : `${assetData.openPnLPercentage}%`}
+                  </div>
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between mt-10 mb-8 space-x-2">
-            <p className="text-2xl font-bold text-white">Total Value</p>
-            <div className="flex">
+          {/* <div className="flex items-center justify-between mt-10 mb-8 space-x-2"> */}
+          {/* <p className="text-2xl font-bold text-white">Total Value</p> */}
+          {/* <div className="flex">
               <div className="text-lg font-bold text-white mr-2">
                 {assetData.currentTotalValue}
               </div>
@@ -212,8 +260,8 @@ const AssetInfoModal = () => {
                     : `${assetData.openPnLPercentage}%`}
                 </div>
               </span>
-            </div>
-          </div>
+            </div> */}
+          {/* </div> */}
 
           <div className="text-gray-200">
             <div className="flex items-center justify-between pb-2 mb-2 space-x-12 text-lg border-b border-gray-600 md:space-x-24">
@@ -228,7 +276,7 @@ const AssetInfoModal = () => {
                 {assetData.currPrice}
               </div>
             </div>
-            <div className="flex items-center justify-between pb-2 mb-2 space-x-12 text-lg border-b border-gray-600 md:space-x-24">
+            <div className="flex items-center justify-between pb-2 mb-2 space-x-12 text-lg border-gray-600 md:space-x-24">
               <p>Purchase Price</p>
               <div className="flex items-end text-lg">
                 {assetData.purchasePrice}
@@ -255,8 +303,58 @@ const AssetInfoModal = () => {
           </div>
         </div> */}
           </div>
+          <div>
+            <ul className="my-10 flex flex-col divide-y-0 divide-gray-600 w-full">
+              {assetData.assetsInfo.map((value: any, idx: number) => (
+                <S.ListElement key={`${value.symbol}_${idx}`}>
+                  <S.ContentWrapper className="listItem">
+                    {/* <div>{value.chainKey}</div> */}
+                    <S.AssetImg>
+                      <S.Img alt="chain icon" src={value.chainImg} />
+                    </S.AssetImg>
+                    <S.NameAndPriceWrapper>
+                      <S.Name>Chain: {value.chainName}</S.Name>
+                      <S.LatestPrice>
+                        Balance: {value.balance} {value.symbol.toUpperCase()}
+                      </S.LatestPrice>
+                    </S.NameAndPriceWrapper>
+
+                    <S.ValueAndBalance>
+                      {/* <S.AssetValue>Total Value</S.AssetValue> */}
+                      <S.AssetValue>{value.name}</S.AssetValue>
+                      <S.Balance>
+                        {convertToCurrency(
+                          value.balance * assetData.notConvertedCurrPrice,
+                          value.decimal
+                        )}
+                      </S.Balance>
+                    </S.ValueAndBalance>
+                  </S.ContentWrapper>
+                </S.ListElement>
+
+                // <AssetItem
+                //   triggerWarning={setShowMessage}
+                //   key={`${idx}_${value.symbol}`}
+                //   iconAddress={value.imgSmall}
+                //   tokenName={value.symbol.toUpperCase()}
+                //   symbol={value.symbol}
+                //   fourDecimalsBalance={value.fourDecimalsStringBalance}
+                //   latestPrice={
+                //     typeof value.latestPrice === "number"
+                //       ? convertToCurrency(value.latestPrice, value.decimal)
+                //       : value.latestPrice
+                //   }
+                //   assetValue={
+                //     typeof value.assetValue === "number"
+                //       ? convertToCurrency(value.assetValue, null)
+                //       : value.assetValue
+                //   }
+                // />
+              ))}
+            </ul>
+          </div>
         </div>
-      </ListItem>
+      </S.ListItem>
     </div>
   )
 }

@@ -14,7 +14,6 @@ const PORT = process.env.PORT || 3001
 
 app.use(cors())
 
-
 app.get("/wallet", (req, res) => {
   fs.readFile(WALLET_DATA, (err, data) => {
     if (err) throw err
@@ -22,7 +21,6 @@ app.get("/wallet", (req, res) => {
     res.json(JSON.parse(data))
   })
 })
-
 
 app.get('/get-prices/:query', (req, res) => {
   const { query } = req.params
@@ -34,7 +32,6 @@ app.get('/get-prices/:query', (req, res) => {
       res.send(error)
     })
 })
-
 
 app.listen(PORT, () => {
   console.log(`Server is running on ${PORT}...`)

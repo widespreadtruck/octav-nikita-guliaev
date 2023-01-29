@@ -41,7 +41,7 @@ const WalletAssetsList = (portfolioSummaryData: any): JSX.Element => {
        return typeof a.assetValue === "number" ? -1 : 1
      }
   })
-console.log(sortedAssets)
+// console.log(sortedAssets)
 
   const totalWalletValue =
     portfolioSummaryData["portfolioSummaryData"][

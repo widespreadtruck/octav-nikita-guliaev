@@ -13,7 +13,7 @@ export const TitlesContainer = tw.div`
     flex-1 pl-1 md:mr-16
 `
 export const Title = tw.div`
-    text-sm text-gray-200
+    text-lg text-gray-200
 `
 export const Balance = tw.div`
     font-medium text-white
