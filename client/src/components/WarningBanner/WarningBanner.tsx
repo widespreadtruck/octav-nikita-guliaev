@@ -2,9 +2,10 @@ import React from "react"
 import { useSpring, animated } from "react-spring"
 
 const WarningBanner = ({ status }: { status: boolean }) => {
-  const animationProps = useSpring({
-    transform: status ? "translateX(0%)" : "translateX(100%)",
-  })
+const animationProps = useSpring({
+  from: { transform: "translateX(100%)" },
+  to: { transform: status ? "translateX(0%)" : "translateX(100%)" },
+})
 
   return (
     <animated.div

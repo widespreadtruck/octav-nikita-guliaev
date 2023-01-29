@@ -16,7 +16,7 @@ import styled from "styled-components"
 const ListItem = styled.div`
   min-width: 700px;
   max-width: 1000px;
-  width: 100%;
+  width: 80%;
 `
 
 const AssetInfoModal = () => {

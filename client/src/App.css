@@ -4,13 +4,14 @@ ul li:first-child .listItem {
 
 ul li:last-child .listItem {
   @apply rounded-b-lg;
+  margin-bottom: 20px;
 }
 ul li:last-child .listItem {
   @apply border-b;
 }
+
 .listItem {
   min-width: 500px;
   max-width: 1000px;
 }
-
 
