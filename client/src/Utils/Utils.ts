@@ -18,3 +18,8 @@ export const convertToDecimals = (num: number, decimal: number) => {
     })
     return balance.format(num)
   }
+
+  export const removeSpaces = (str: string) => {
+    return str.replace(/\s+/g, "")
+  }
+  

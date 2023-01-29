@@ -1,7 +1,11 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react"
 import "../../App.css"
 import axios from "axios"
-import { convertToDecimals, convertToCurrency } from "../../Utils/Utils"
+import {
+  convertToDecimals,
+  convertToCurrency,
+  removeSpaces,
+} from "../../Utils/Utils"
 import Spinner from "../../components/Spinner/Spinner"
 import SkeletonLoader from "../../components/SkeletonLoader/SkeletonLoader"
 import WalletAssetsList from "../../components/WalletAssetsList/WalletAssetsList"
@@ -54,7 +58,7 @@ const WalletPage: React.FC = React.memo(() => {
 
   const [portfolioSummary, setPortfolioSummary] =
     useState<any>({})
-  const [isLoading, setIsLoading] = useState<Boolean>(true)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<Error | null>(null)
 
   const getWalletInformation = useMemo(() => {
@@ -75,7 +79,7 @@ const WalletPage: React.FC = React.memo(() => {
       chain.protocolPositions.WALLET.assets.forEach((asset) => {
         if (!walletAssetInfo[asset.symbol]) {
           walletAssetInfo[asset.symbol] = {
-            symbol: asset.symbol,
+            symbol: removeSpaces(asset.symbol),
             name: asset.name,
             chainKey: chain.key,
             balance: asset.balance,
@@ -92,7 +96,7 @@ const WalletPage: React.FC = React.memo(() => {
         }
       })
     })
-
+console.log(walletAssetInfo)
     return walletAssetInfo
   }, [portfolioData])
 

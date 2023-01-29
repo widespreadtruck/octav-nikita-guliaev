@@ -5,13 +5,19 @@ import { RootState } from "../../store/index"
 import { useSelector, useDispatch } from "react-redux"
 import * as S from "./AssetInfoModal.styles"
 import Spinner from "../Spinner/Spinner"
+import WarningBanner from "../WarningBanner/WarningBanner"
 import axios from "axios"
-import { convertToCurrency, convertToDecimals } from "../../Utils/Utils"
+import {
+  convertToCurrency,
+  convertToDecimals,
+  removeSpaces,
+} from "../../Utils/Utils"
 
 const AssetInfoModal = () => {
   const portfolioData = usePortfolioData()
 
-  const [isLoading, setIsLoading] = useState<Boolean>(true)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [showMessage, setShowMessage] = useState<boolean>(false)
   const [assetData, setAssetData] = useState<any>({})
 
   const location = useLocation()
@@ -21,20 +27,20 @@ const AssetInfoModal = () => {
     return str.substring(lastSlashIndex + 1)
   }
   const assetSymbol = getAsset(location.pathname)
-  console.log("assetSymbol", assetSymbol)
+  // console.log("assetSymbol", assetSymbol)
 
-  const fetchData = useCallback(async () => {
-    try {
-      const response = await axios.get(`/wallet/${assetSymbol}`)
-      console.log("response", response)
-    } catch (err: any) {
-      console.log(`An error occurred: ${err.message}`)
-    }
-  }, [])
+  // const fetchData = useCallback(async () => {
+  //   try {
+  //     const response = await axios.get(`/wallet/${assetSymbol}`)
+  //     console.log("response", response)
+  //   } catch (err: any) {
+  //     console.log(`An error occurred: ${err.message}`)
+  //   }
+  // }, [])
 
-  useEffect(() => {
-    fetchData()
-  }, [])
+  // useEffect(() => {
+  //   fetchData()
+  // }, [])
 
   const handleGoBack = () => {
     window.history.back()
@@ -67,58 +73,77 @@ const AssetInfoModal = () => {
         // console.log(asset)
       })
     })
+    console.log("query", query.length)
 
-    try {
-      axios.get(`/get-prices/${query}`).then((res) => {
-        const coin = res.data.coins
+    if (query.length === 0) {
+      console.log("hey")
+      // setIsLoading(false)
+      // setShowMessage(true)
+    } else {
+      try {
+        axios.get(`/get-prices/${query}`).then((res) => {
+          const coin = res.data.coins
+          console.log(res)
 
-        let currPrice: number = 0
-        Object.values(coin).forEach((obj: any) => {
-          currPrice = obj.price
-        })
+          let currPrice: number = 0
+          Object.values(coin).forEach((obj: any) => {
+            console.log(coin)
+            currPrice = obj.price
+          })
 
-        const currentTotalValue = currPrice * totalBalance
-        const totalValueAtPurchase = purchasePrice * totalBalance
-        const openPnL =
-          ((currentTotalValue - totalValueAtPurchase) / totalValueAtPurchase) *
-          100
+          const currentTotalValue = currPrice * totalBalance
+          const totalValueAtPurchase = purchasePrice * totalBalance
+          const openPnL =
+            ((currentTotalValue - totalValueAtPurchase) /
+              totalValueAtPurchase) *
+            100
 
-        if (openPnL > 0) {
-          positiveReturn = true
-          openPnLPercentage = openPnL
-        }
-        if (openPnL < 0) {
-          openPnLPercentage = Math.abs(openPnL)
-        }
+          if (openPnL > 0) {
+            positiveReturn = true
+            openPnLPercentage = openPnL
+          }
+          if (openPnL < 0) {
+            openPnLPercentage = Math.abs(openPnL)
+          }
 
-        const currentTotalValueToDecimals = convertToDecimals(
-          currentTotalValue,
-          decimal
-        )
-
-        assetCompleteInfo = {
-          name,
-          assetsInfo,
-          assetSymbol,
-          totalBalance: convertToDecimals(totalBalance, decimal),
-          purchasePrice: convertToCurrency(purchasePrice, decimal),
-          currPrice: convertToCurrency(currPrice, decimal),
-          currentTotalValue: convertToCurrency(
-            currentTotalValueToDecimals,
+          const currentTotalValueToDecimals = convertToDecimals(
+            currentTotalValue,
             decimal
-          ),
-          totalValueAtPurchase,
-          positiveReturn: openPnL === 0 ? null : positiveReturn,
-          openPnLPercentage: convertToDecimals(openPnLPercentage, 2),
-        }
+          )
 
-        setAssetData(assetCompleteInfo)
-        setIsLoading(false)
-      })
-    } catch (err: any) {
-      console.log(`An error occurred: ${err.message}`)
+          assetCompleteInfo = {
+            name,
+            assetsInfo,
+            assetSymbol,
+            totalBalance: convertToDecimals(totalBalance, decimal),
+            purchasePrice: convertToCurrency(purchasePrice, decimal),
+            currPrice: convertToCurrency(currPrice, decimal),
+            currentTotalValue: convertToCurrency(
+              currentTotalValueToDecimals,
+              decimal
+            ),
+            totalValueAtPurchase,
+            positiveReturn: openPnL === 0 ? null : positiveReturn,
+            openPnLPercentage: convertToDecimals(openPnLPercentage, 2),
+          }
+
+          setAssetData(assetCompleteInfo)
+          setIsLoading(false)
+        })
+      } catch (err: any) {
+        console.log(`An error occurred: ${err.message}`)
+      }
     }
   }, [portfolioData])
+
+  // if (isLoading && showMessage) {
+  //   return (
+  //     <S.Container>
+  //       <WarningBanner />
+  //       <Spinner />
+  //     </S.Container>
+  //   )
+  // }
 
   if (isLoading) {
     return (
@@ -129,6 +154,7 @@ const AssetInfoModal = () => {
     )
   }
 
+  console.log("assetData", assetData)
 
   return (
     // <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 z-50">
