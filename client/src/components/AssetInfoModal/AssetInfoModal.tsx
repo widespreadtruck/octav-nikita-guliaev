@@ -7,10 +7,7 @@ import * as S from "./AssetInfoModal.styles"
 import Spinner from "../Spinner/Spinner"
 import WarningBanner from "../WarningBanner/WarningBanner"
 import axios from "axios"
-import {
-  convertToCurrency,
-  convertToDecimals,
-} from "../../Utils/Utils"
+import { convertToCurrency, convertToDecimals } from "../../Utils/Utils"
 import styled from "styled-components"
 
 const ListItem = styled.div`
@@ -66,7 +63,6 @@ const AssetInfoModal = () => {
       try {
         axios.get(`/get-prices/${query}`).then((res) => {
           const coin = res.data.coins
-          console.log(res)
 
           let currPrice: number = 0
           Object.values(coin).forEach((obj: any) => {
@@ -80,6 +76,7 @@ const AssetInfoModal = () => {
             ((currentTotalValue - totalValueAtPurchase) /
               totalValueAtPurchase) *
             100
+          console.log(openPnL)
 
           if (openPnL > 0) {
             positiveReturn = true
@@ -131,8 +128,6 @@ const AssetInfoModal = () => {
   console.log("assetData", assetData)
 
   return (
-    // <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 z-50">
-    //   <div className="relative mx-auto my-0 max-w-lg w-full">
     <div className="w-full h-screen px-4 py-6 bg-zinc-900 flex flex-col items-center justify-start mx-auto">
       <ListItem>
         <div className="h-auto bg-gray-800 p-16 rounded-lg">
@@ -174,7 +169,7 @@ const AssetInfoModal = () => {
                 />
               </S.AssetImg>
             </div>
-            <div className="text-4xl font-semibold w-max text-white">
+            <div className="text-4xl font-semibold w-max text-white text-right">
               {assetData.name}
             </div>
           </div>
@@ -211,11 +206,10 @@ const AssetInfoModal = () => {
                       ? "text-green-500"
                       : "text-red-500"
                   }
-                  // className={
-                  //   assetData.positiveReturn ? "text-green-500" : "text-red-500"
-                  // }
                 >
-                  {assetData.openPnLPercentage}%
+                  {assetData.openPnLPercentage == Infinity
+                    ? ""
+                    : `${assetData.openPnLPercentage}%`}
                 </div>
               </span>
             </div>
@@ -225,7 +219,7 @@ const AssetInfoModal = () => {
             <div className="flex items-center justify-between pb-2 mb-2 space-x-12 text-lg border-b border-gray-600 md:space-x-24">
               <p>Total Balance</p>
               <div className="flex items-end text-lg">
-                {assetData.totalBalance} {assetData.assetSymbol}
+                {assetData.totalBalance} {assetData.assetSymbol.toUpperCase()}
               </div>
             </div>
             <div className="flex items-center justify-between pb-2 mb-2 space-x-12 text-lg border-b border-gray-600 md:space-x-24">

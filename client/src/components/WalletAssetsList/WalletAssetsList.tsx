@@ -31,6 +31,17 @@ const WalletAssetsList = (portfolioSummaryData: any): JSX.Element => {
   const assets = Object.values(
     portfolioSummaryData["portfolioSummaryData"]["updatedWalletInfo"]
   )
+  // sort the assets by the total value, then assets that don't have current Prices
+  const sortedAssets = assets.sort((a: any, b: any): any => {
+     if (typeof a.assetValue === "number" && typeof b.assetValue === "number") {
+       return b.assetValue - a.assetValue
+     } else if (typeof a.assetValue === "string" && typeof b.assetValue === "string") {
+       return a.assetValue.localeCompare(b.assetValue)
+     } else {
+       return typeof a.assetValue === "number" ? -1 : 1
+     }
+  })
+console.log(sortedAssets)
 
   const totalWalletValue =
     portfolioSummaryData["portfolioSummaryData"][
@@ -52,7 +63,7 @@ const WalletAssetsList = (portfolioSummaryData: any): JSX.Element => {
       <WarningBanner status={showMessage} />
 
       <ul className=" flex flex-col divide-y-0 divide-gray-600 w-full">
-        {assets.map((value: any, idx: number) => (
+        {sortedAssets.map((value: any, idx: number) => (
           <AssetItem
             triggerWarning={setShowMessage}
             key={`${idx}_${value.symbol}`}
