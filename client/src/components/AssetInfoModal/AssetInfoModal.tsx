@@ -8,13 +8,52 @@ import axios from "axios"
 import { convertToCurrency, convertToDecimals } from "../../Utils/Utils"
 import useChainImages from "../hooks/useChainImages"
 import OpenPnL from "../OpenPnL/OpenPnL"
+import ArrowLeft from '../../assets/ArrowLeft'
 
+interface AssetData {
+  name: string
+  imgLarge: string
+  assetsInfo: Array<{
+    chainKey: string
+    chainImg: string
+    chainName: string
+    symbol: string
+    balance: number
+    decimal: number
+    price: number
+  }>
+  assetSymbol: string
+  totalBalance: number
+  purchasePrice: string
+  currPrice: string
+  notConvertedCurrPrice: number
+  currentTotalValue: string
+  totalValueAtPurchase: number
+  positiveReturn: boolean | null
+  openPnLPercentage: number
+}
+
+const initialAssetData: AssetData = {
+  name: '',
+  imgLarge: '',
+  assetsInfo: [],
+  assetSymbol: '',
+  totalBalance: 0,
+  purchasePrice: '',
+  currPrice: '',
+  notConvertedCurrPrice: 0,
+  currentTotalValue: '',
+  totalValueAtPurchase: 0,
+  positiveReturn: true,
+  openPnLPercentage: 0
+}
 const AssetInfoModal = () => {
   const portfolioData = usePortfolioData()
   const chainImages = useChainImages()
 
+
   const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [assetData, setAssetData] = useState<any>({})
+  const [assetData, setAssetData] = useState<AssetData>(initialAssetData)
 
   const location = useLocation()
 
@@ -29,107 +68,108 @@ const AssetInfoModal = () => {
   }
 
   useEffect(() => {
-    if (!portfolioData) return
-    let assetsInfo: any = []
-    let assetCompleteInfo: any = {}
-    let query: string = ""
-    let totalBalance: number = 0
-    let purchasePrice: any = 0
-    let positiveReturn: boolean = false
-    let openPnLPercentage: number = 0
-    let decimal: number = 0
-    let name: string = ""
-    let imgLarge: string = ""
+    if (portfolioData !== null) {
+      let assetsInfo: any = []
+      let assetCompleteInfo: any = {}
+      let query: string = ""
+      let totalBalance: number = 0
+      let purchasePrice: number = 0
+      let positiveReturn: boolean = false
+      let openPnLPercentage: number = 0
+      let decimal: number = 0
+      let name: string = ""
+      let imgLarge: string = ""
 
-    Object.values(portfolioData.wallet.chains).forEach((chain) => {
-      chain.protocolPositions.WALLET.assets.forEach((asset) => {
-        if (asset.symbol === assetSymbol) {
-          console.log(asset)
-          assetsInfo.push(asset)
-          query = asset.chainContract
-          totalBalance += asset.balance
-          purchasePrice = asset.price
-          decimal = asset.decimal
-          name = asset.name
-          imgLarge = asset.imgLarge
-        }
-      })
-    })
-
-    //add chain images to each asset
-    if (chainImages) {
-      assetsInfo.map((asset: any) => {
-        Object.values(chainImages).forEach((chain: any) => {
-          if (asset.chainKey === chain.key) {
-            asset.chainImg = chain.imgLarge
-            asset.chainName = chain.name
+      Object.values(portfolioData.wallet.chains).forEach((chain) => {
+        chain.protocolPositions.WALLET.assets.forEach((asset) => {
+          if (asset.symbol === assetSymbol) {
+            console.log(asset)
+            assetsInfo.push(asset)
+            query = asset.chainContract
+            totalBalance += asset.balance
+            purchasePrice = asset.price
+            decimal = asset.decimal
+            name = asset.name
+            imgLarge = asset.imgLarge
           }
         })
       })
-    }
 
-    if (query.length !== 0) {
-      try {
-        axios.get(`/get-prices/${query}`).then((res) => {
-          const coin = res.data.coins
-
-          let currPrice: number = 0
-          Object.values(coin).forEach((obj: any) => {
-            currPrice = obj.price
+      //add chain images to each asset
+      if (chainImages) {
+        assetsInfo.map((asset: any) => {
+          Object.values(chainImages).forEach((chain: any) => {
+            if (asset.chainKey === chain.key) {
+              asset.chainImg = chain.imgLarge
+              asset.chainName = chain.name
+            }
           })
-
-          const currentTotalValue = currPrice * totalBalance
-          const totalValueAtPurchase = purchasePrice * totalBalance
-          const openPnL =
-            ((currentTotalValue - totalValueAtPurchase) /
-              totalValueAtPurchase) *
-            100
-
-          if (openPnL > 0) {
-            positiveReturn = true
-            openPnLPercentage = openPnL
-          }
-          if (openPnL < 0) {
-            openPnLPercentage = Math.abs(openPnL)
-          }
-
-          const currentTotalValueToDecimals = convertToDecimals(
-            currentTotalValue,
-            decimal
-          )
-
-          assetCompleteInfo = {
-            name,
-            imgLarge,
-            assetsInfo,
-            assetSymbol,
-            totalBalance: convertToDecimals(totalBalance, decimal),
-            purchasePrice: convertToCurrency(purchasePrice, decimal),
-            currPrice: convertToCurrency(currPrice, decimal),
-            notConvertedCurrPrice: currPrice,
-            currentTotalValue: convertToCurrency(
-              currentTotalValueToDecimals,
-              decimal
-            ),
-            totalValueAtPurchase,
-            positiveReturn: openPnL === 0 ? null : positiveReturn,
-            openPnLPercentage: convertToDecimals(openPnLPercentage, 2),
-          }
-
-          setAssetData(assetCompleteInfo)
-          setIsLoading(false)
         })
-      } catch (err: any) {
-        console.log(`An error occurred: ${err.message}`)
+      }
+
+      if (query.length !== 0) {
+        try {
+          axios.get(`/get-prices/${query}`).then((res) => {
+            const coin = res.data.coins
+
+            let currPrice: number = 0
+            Object.values(coin).forEach((obj: any) => {
+              currPrice = obj.price
+            })
+
+            const currentTotalValue = currPrice * totalBalance
+            const totalValueAtPurchase = purchasePrice * totalBalance
+            const openPnL =
+              ((currentTotalValue - totalValueAtPurchase) /
+                totalValueAtPurchase) *
+              100
+
+            if (openPnL > 0) {
+              positiveReturn = true
+              openPnLPercentage = openPnL
+            }
+            if (openPnL < 0) {
+              openPnLPercentage = Math.abs(openPnL)
+            }
+
+            const currentTotalValueToDecimals = convertToDecimals(
+              currentTotalValue,
+              decimal
+            )
+
+            assetCompleteInfo = {
+              name,
+              imgLarge,
+              assetsInfo,
+              assetSymbol,
+              totalBalance: convertToDecimals(totalBalance, decimal),
+              purchasePrice: convertToCurrency(purchasePrice, decimal),
+              currPrice: convertToCurrency(currPrice, decimal),
+              notConvertedCurrPrice: currPrice,
+              currentTotalValue: convertToCurrency(
+                currentTotalValueToDecimals,
+                decimal
+              ),
+              totalValueAtPurchase,
+              positiveReturn: openPnL === 0 ? null : positiveReturn,
+              openPnLPercentage: convertToDecimals(openPnLPercentage, 2),
+            }
+
+            setAssetData(assetCompleteInfo)
+            setIsLoading(false)
+          })
+        } catch (err: any) {
+          console.log(`An error occurred: ${err.message}`)
+        }
       }
     }
+
   }, [portfolioData, chainImages])
 
   if (isLoading) {
     return (
       <S.Container>
         <Spinner />
-        {/* <SkeletonLoader /> */}
       </S.Container>
     )
   }
@@ -145,21 +185,7 @@ const AssetInfoModal = () => {
             type="button"
             className="group border border-gray-400 group-hover:text-gray-200 hover:border-gray-200 focus:ring-1 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm py-2.5 px-6 text-center inline-flex items-center mb-1"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="feather feather-arrow-left text-gray-400 group-hover:text-gray-200"
-            >
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
+            <ArrowLeft />
             <div className="text-gray-400 ml-2 group-hover:text-gray-200">
               Back
             </div>

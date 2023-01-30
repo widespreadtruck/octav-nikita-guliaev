@@ -26,11 +26,12 @@ const AssetItem = ({
   const location = useLocation()
 
   const handleClick = (symbol: string, latestPrice: string | number) => {
+    // show a banner if the live Price wasn't fetched
     if (latestPrice === "N/A") {
       triggerWarning(true)
       return
     }
-
+    // navigate to the Item modal
     navigate(`${location.pathname}/${symbol}`)
   }
 

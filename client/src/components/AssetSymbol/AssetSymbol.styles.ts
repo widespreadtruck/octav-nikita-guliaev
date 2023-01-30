@@ -6,5 +6,5 @@ export const SymbolImg = tw.div`
 `
 
 export const Img = tw.img`
-    mx-auto object-cover rounded-full ml-0 mr-0 h-full w-full
+    mx-auto object-cover rounded-full ml-0 mr-0 h-full w-full animate-pulse
 `
