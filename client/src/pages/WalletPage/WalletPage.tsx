@@ -10,26 +10,15 @@ import SkeletonLoader from "../../components/SkeletonLoader/SkeletonLoader"
 import WalletAssetsList from "../../components/WalletAssetsList/WalletAssetsList"
 import usePortfolioData from "../../components/hooks/usePortfolioData"
 import * as S from "../../App.styles"
-import { useDispatch } from "react-redux"
 
 interface Error {
   message: string
 }
 
-// interface PortfolioSummaryTypes {
-//   [key: string]: {
-//     symbol: string
-//     chainKey: string
-//     balance: number
-//     imgSmall: string
-//     decimal: number
-//     chainContract: string
-//     fullStringBalance: string
-//     fourDecimalsStringBalance: string
-//     latestPrice: string | number
-//     assetValue: string | number
-//   }
-// }
+interface PortfolioSummaryTypes {
+  updatedWalletInfo: WalletAssetInfoTypes
+  convertedToCurrencyTotalValue: string
+}
 
 interface WalletAssetInfoTypes {
   [key: string]: {
@@ -45,15 +34,19 @@ interface WalletAssetInfoTypes {
     assetValue: string | number
     fullStringBalance: null | string
     fourDecimalsStringBalance: null | string
+    convertedToCurrencyTotalValue: string
   }
 }
 
 const WalletPage: React.FC = React.memo(() => {
   const portfolioData = usePortfolioData()
-  const dispatch = useDispatch()
 
-  const [portfolioSummary, setPortfolioSummary] =
-    useState<any>({})
+const [portfolioSummary, setPortfolioSummary] = useState<PortfolioSummaryTypes>(
+  {
+    updatedWalletInfo: {},
+    convertedToCurrencyTotalValue: "$0.00",
+  }
+)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<Error | null>(null)
 
@@ -86,6 +79,7 @@ const WalletPage: React.FC = React.memo(() => {
             fourDecimalsStringBalance: null,
             latestPrice: "N/A",
             assetValue: "N/A",
+            convertedToCurrencyTotalValue: '',
           }
         } else {
           walletAssetInfo[asset.symbol].balance += asset.balance
@@ -96,7 +90,7 @@ console.log(walletAssetInfo)
     return walletAssetInfo
   }, [portfolioData])
 
-  const convertBalances = (obj: any) => {
+  const convertBalances = (obj: WalletAssetInfoTypes) => {
     // this func deals converts scientific nums to regular nums
     // by using "convertToDecimals" which is using "decimal.js"
     // to mathematically correctly convert and round the large nums
@@ -162,9 +156,10 @@ console.log(walletAssetInfo)
               updatedWalletInfo,
               convertedToCurrencyTotalValue,
             }
-            setPortfolioSummary(upd)
-
-
+            setPortfolioSummary({
+                updatedWalletInfo,
+                convertedToCurrencyTotalValue,
+              })
             setIsLoading(false)
           })
           .catch((error) => {
