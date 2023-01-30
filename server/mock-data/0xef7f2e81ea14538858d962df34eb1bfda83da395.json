@@ -279,7 +279,7 @@
                   "chainContract": "polygon:0x1a13f4ca1d028320a707d99520abfefca3998b7f",
                   "chainKey": "polygon",
                   "contract": "0x1a13f4ca1d028320a707d99520abfefca3998b7f",
-                  "decimal": 0,
+                  "decimal": 6,
                   "explorerUrl": "https://polygonscan.com/token/0x1a13f4ca1d028320a707d99520abfefca3998b7f",
                   "imgSmall": "https://images.octav.fi/tokens/small/0x1a13f4ca1d028320a707d99520abfefca3998b7f_small_icon.png",
                   "imgLarge": "https://images.octav.fi/tokens/large/0x1a13f4ca1d028320a707d99520abfefca3998b7f_large_icon.png",

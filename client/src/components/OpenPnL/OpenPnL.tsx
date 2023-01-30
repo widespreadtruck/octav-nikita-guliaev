@@ -1,4 +1,5 @@
 import React from "react"
+import * as S from "./OpenPnL.styles"
 
 const OpenPnL = ({ assetData }: { assetData: any }) => {
   return (
@@ -24,7 +25,7 @@ const OpenPnL = ({ assetData }: { assetData: any }) => {
           </svg>
         )}
 
-        <div
+        <S.NumWrapper
           className={
             assetData.positiveReturn == null
               ? "text-white"
@@ -36,7 +37,7 @@ const OpenPnL = ({ assetData }: { assetData: any }) => {
           {assetData.openPnLPercentage == Infinity
             ? "MAX"
             : `${assetData.openPnLPercentage}%`}
-        </div>
+        </S.NumWrapper>
       </span>
     </div>
   )

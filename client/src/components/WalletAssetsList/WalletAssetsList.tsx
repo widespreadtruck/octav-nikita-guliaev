@@ -4,30 +4,13 @@ import { convertToCurrency } from "../../Utils/Utils"
 import WalletHeader from "../WalletHeader/WalletHeader"
 import "../../App.css"
 import WarningBanner from "../WarningBanner/WarningBanner"
+import { PortfolioSummaryTypes } from '../../pages/WalletPage/WalletPage'
 
-// interface PortfolioSummaryTypes {
-//   [key: string]: {
-//     // convertedToCurrencyTotalValue: string,
-//     [key: string]: {
-//       symbol: string
-//       chainKey: string
-//       balance: number
-//       imgSmall: string
-//       decimal: number
-//       chainContract: string
-//       fullStringBalance: string
-//       fourDecimalsStringBalance: string
-//       latestPrice: string | number
-//       assetValue: string | number
-//     }
-//   }
-// }
-
-const WalletAssetsList = (portfolioSummaryData: any): JSX.Element => {
+const WalletAssetsList = ({portfolioSummary}:{portfolioSummary: PortfolioSummaryTypes}): JSX.Element => {
       const [showMessage, setShowMessage] = useState<boolean>(false)
 
   const assets = Object.values(
-    portfolioSummaryData["portfolioSummaryData"]["updatedWalletInfo"]
+    portfolioSummary["updatedWalletInfo"]
   )
   // sort the assets by the total value, then assets that don't have current Prices
   const sortedAssets = assets.sort((a: any, b: any): any => {
@@ -41,8 +24,8 @@ const WalletAssetsList = (portfolioSummaryData: any): JSX.Element => {
   })
 
   const totalWalletValue =
-    portfolioSummaryData["portfolioSummaryData"][
-      "convertedToCurrencyTotalValue"
+    portfolioSummary[
+      "convertedToCurrencyTotalWalletValue"
     ]
 
   useEffect(() => {

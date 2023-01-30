@@ -134,7 +134,7 @@ const AssetInfoModal = () => {
     )
   }
 
-  // console.log("assetData", assetData)
+  console.log("assetData", assetData)
 
   return (
     <div className=" overflow-auto w-full h-screen px-4 py-6 bg-zinc-900 flex flex-col items-center justify-start mx-auto">
@@ -221,7 +221,8 @@ const AssetInfoModal = () => {
                     <S.NameAndPriceWrapper>
                       <S.Name>Chain: {value.chainName}</S.Name>
                       <S.LatestPrice>
-                        Balance: {value.balance} {value.symbol.toUpperCase()}
+                        Balance: {convertToDecimals(value.balance, value.decimal)}{" "}
+                        {value.symbol.toUpperCase()}
                       </S.LatestPrice>
                     </S.NameAndPriceWrapper>
 

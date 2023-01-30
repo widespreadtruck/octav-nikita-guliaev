@@ -2,9 +2,9 @@ import React, { useEffect, useState, useMemo } from "react"
 import "../../App.css"
 import axios from "axios"
 import {
-  convertToDecimals,
   convertToCurrency,
   removeSpaces,
+  convertBalances,
 } from "../../Utils/Utils"
 import SkeletonLoader from "../../components/SkeletonLoader/SkeletonLoader"
 import WalletAssetsList from "../../components/WalletAssetsList/WalletAssetsList"
@@ -15,12 +15,12 @@ interface Error {
   message: string
 }
 
-interface PortfolioSummaryTypes {
+export interface PortfolioSummaryTypes {
   updatedWalletInfo: WalletAssetInfoTypes
-  convertedToCurrencyTotalValue: string
+  convertedToCurrencyTotalWalletValue: string
 }
 
-interface WalletAssetInfoTypes {
+export interface WalletAssetInfoTypes {
   [key: string]: {
     symbol: string
     name: string
@@ -34,26 +34,25 @@ interface WalletAssetInfoTypes {
     assetValue: string | number
     fullStringBalance: null | string
     fourDecimalsStringBalance: null | string
-    convertedToCurrencyTotalValue: string
+    convertedToCurrencyTotalWalletValue: string
   }
 }
 
 const WalletPage: React.FC = React.memo(() => {
   const portfolioData = usePortfolioData()
 
-const [portfolioSummary, setPortfolioSummary] = useState<PortfolioSummaryTypes>(
-  {
-    updatedWalletInfo: {},
-    convertedToCurrencyTotalValue: "$0.00",
-  }
-)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<Error | null>(null)
+  const [portfolioSummary, setPortfolioSummary] =
+    useState<PortfolioSummaryTypes>({
+      updatedWalletInfo: {},
+      convertedToCurrencyTotalWalletValue: "$0.00",
+    })
 
   const getWalletInformation = useMemo(() => {
     // this sums up all balances of the same token
     // across different chains
-    // ie. ETH is on 3 diff chains, so we need to show ETH balance as a sum
+    // ie. ETH is on 3 diff chains, so we show ETH balance as a sum
 
     // Also,
     // this func adds more keys that would be used later
@@ -79,43 +78,16 @@ const [portfolioSummary, setPortfolioSummary] = useState<PortfolioSummaryTypes>(
             fourDecimalsStringBalance: null,
             latestPrice: "N/A",
             assetValue: "N/A",
-            convertedToCurrencyTotalValue: '',
+            convertedToCurrencyTotalWalletValue: "",
           }
         } else {
           walletAssetInfo[asset.symbol].balance += asset.balance
         }
       })
     })
-console.log(walletAssetInfo)
+    console.log(walletAssetInfo)
     return walletAssetInfo
   }, [portfolioData])
-
-  const convertBalances = (obj: WalletAssetInfoTypes) => {
-    // this func deals converts scientific nums to regular nums
-    // by using "convertToDecimals" which is using "decimal.js"
-    // to mathematically correctly convert and round the large nums
-    for (let token in obj) {
-      //get a full balance as a regular number as a string
-      obj[token].fullStringBalance = convertToDecimals(
-        obj[token].balance,
-        obj[token].decimal
-      )
-      // get the balance rounded up to 4 decimals
-      // or if there is 0 decimals, to round nums
-      if (obj[token].decimal >= 4) {
-        obj[token].fourDecimalsStringBalance = convertToDecimals(
-          obj[token].balance,
-          4
-        )
-      } else {
-        obj[token].fourDecimalsStringBalance = convertToDecimals(
-          obj[token].balance,
-          obj[token].decimal
-        )
-      }
-    }
-    return obj
-  }
 
   useEffect(() => {
     if (portfolioData) {
@@ -133,33 +105,32 @@ console.log(walletAssetInfo)
           .get(`/get-prices/${priceQuery}`)
           .then((response) => {
             const assetPriceData = response.data.coins
-            let totalValue = 0
-            // add the Price data from DefiLlama to our object
+            let totalWalletValue = 0
+            // add the Price data from DefiLlama to the object
             for (const key in assetPriceData) {
               const symbol = assetPriceData[key].symbol.toUpperCase()
               const price = assetPriceData[key].price
               for (const walletKey in updatedWalletInfo) {
+                // adds latest fetched asset price & calulates total basis
+                // for all assets where the live price is available from DefiLlama
                 if (walletKey.toUpperCase() === symbol) {
                   const balance = updatedWalletInfo[walletKey].balance
                   updatedWalletInfo[walletKey].latestPrice = price
                   updatedWalletInfo[walletKey].assetValue = price * balance
-                  totalValue = totalValue + price * balance
+                  totalWalletValue = totalWalletValue + price * balance
                 }
               }
             }
 
-            const convertedToCurrencyTotalValue = convertToCurrency(
-              totalValue,
+            const convertedToCurrencyTotalWalletValue = convertToCurrency(
+              totalWalletValue,
               2
             )
-            const upd = {
-              updatedWalletInfo,
-              convertedToCurrencyTotalValue,
-            }
             setPortfolioSummary({
-                updatedWalletInfo,
-                convertedToCurrencyTotalValue,
-              })
+              updatedWalletInfo,
+              convertedToCurrencyTotalWalletValue,
+            })
+            // hides the loader once the data is ready
             setIsLoading(false)
           })
           .catch((error) => {
@@ -189,7 +160,7 @@ console.log(walletAssetInfo)
   return (
     <S.Content>
       <S.InnerWrapper className="listItem">
-        <WalletAssetsList portfolioSummaryData={portfolioSummary} />
+        <WalletAssetsList portfolioSummary={portfolioSummary} />
       </S.InnerWrapper>
     </S.Content>
   )
