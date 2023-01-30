@@ -3,9 +3,11 @@ import usePortfolioData from "../../components/hooks/usePortfolioData"
 import { useLocation } from "react-router-dom"
 import * as S from "./AssetInfoModal.styles"
 import Spinner from "../Spinner/Spinner"
+import AssetSymbolImg from "../AssetSymbol/AssetSymbol"
 import axios from "axios"
 import { convertToCurrency, convertToDecimals } from "../../Utils/Utils"
 import useChainImages from "../hooks/useChainImages"
+import OpenPnL from "../OpenPnL/OpenPnL"
 
 const AssetInfoModal = () => {
   const portfolioData = usePortfolioData()
@@ -37,16 +39,19 @@ const AssetInfoModal = () => {
     let openPnLPercentage: number = 0
     let decimal: number = 0
     let name: string = ""
+    let imgLarge: string = ""
 
     Object.values(portfolioData.wallet.chains).forEach((chain) => {
       chain.protocolPositions.WALLET.assets.forEach((asset) => {
         if (asset.symbol === assetSymbol) {
+          console.log(asset)
           assetsInfo.push(asset)
           query = asset.chainContract
           totalBalance += asset.balance
           purchasePrice = asset.price
           decimal = asset.decimal
           name = asset.name
+          imgLarge = asset.imgLarge
         }
       })
     })
@@ -95,6 +100,7 @@ const AssetInfoModal = () => {
 
           assetCompleteInfo = {
             name,
+            imgLarge,
             assetsInfo,
             assetSymbol,
             totalBalance: convertToDecimals(totalBalance, decimal),
@@ -162,58 +168,25 @@ const AssetInfoModal = () => {
 
           <div className="flex items-center justify-between my-10">
             <div className="flex items-center justify-start">
-              <S.SymbolImg>
-                <S.Img
-                  alt="asset icon"
-                  src={assetData.assetsInfo[0].imgLarge}
-                />
-              </S.SymbolImg>
+              {/* lazy load the asset symbol image */}
+              <AssetSymbolImg assetData={assetData} />
+
               <div className="text-5xl font-semibold w-max text-white mr-4">
                 {assetData.assetSymbol}
               </div>
             </div>
 
-            <div className="flex flex-col items-end justify-center">
-              <div className="text-lg font-semibold text-gray-200 text-right mb-1">
-                TOTAL VALUE
-              </div>
-              <div className="flex">
-                <div className="text-2xl font-bold text-white mr-2 text-right">
+            <div className="flex items-end justify-center">
+              <div className="flex flex-col items-end justify-center mr-1">
+                <div className="text-lg font-semibold text-gray-200 text-right mb-1">
+                  TOTAL COST BASIS
+                </div>
+                <div className="text-2xl font-bold text-white text-right">
                   {assetData.currentTotalValue}
                 </div>
-                <span className="flex items-center text-2xl font-bold text-green-500">
-                  {assetData.positiveReturn == null ? null : (
-                    <svg
-                      width="20"
-                      fill="currentColor"
-                      height="20"
-                      className={`h-5 mr-1 ${
-                        assetData.positiveReturn
-                          ? "text-green-500"
-                          : "text-red-500 transform rotate-180"
-                      }`}
-                      viewBox="0 0 1792 1792"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M1675 971q0 51-37 90l-75 75q-38 38-91 38-54 0-90-38l-294-293v704q0 52-37.5 84.5t-90.5 32.5h-128q-53 0-90.5-32.5t-37.5-84.5v-704l-294 293q-36 38-90 38t-90-38l-75-75q-38-38-38-90 0-53 38-91l651-651q35-37 90-37 54 0 91 37l651 651q37 39 37 91z"></path>
-                    </svg>
-                  )}
-
-                  <div
-                    className={
-                      assetData.positiveReturn == null
-                        ? "text-white"
-                        : assetData.positiveReturn
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }
-                  >
-                    {assetData.openPnLPercentage == Infinity
-                      ? ""
-                      : `${assetData.openPnLPercentage}%`}
-                  </div>
-                </span>
               </div>
+
+              <OpenPnL assetData={assetData} />
             </div>
           </div>
           <div className="text-gray-200">
@@ -236,7 +209,7 @@ const AssetInfoModal = () => {
               </div>
             </div>
           </div>
-          
+
           <div>
             <ul className="mt-10 flex flex-col divide-y-0 divide-gray-600 w-full">
               {assetData.assetsInfo.map((value: any, idx: number) => (

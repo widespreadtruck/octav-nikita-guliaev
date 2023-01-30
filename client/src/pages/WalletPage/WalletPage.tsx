@@ -35,6 +35,7 @@ interface WalletAssetInfoTypes {
   [key: string]: {
     symbol: string
     name: string
+    imgLarge: string
     chainKey: string
     balance: any
     imgSmall: string
@@ -75,6 +76,7 @@ const WalletPage: React.FC = React.memo(() => {
           walletAssetInfo[asset.symbol] = {
             symbol: removeSpaces(asset.symbol),
             name: asset.name,
+            imgLarge: asset.imgLarge,
             chainKey: chain.key,
             balance: asset.balance,
             imgSmall: asset.imgSmall,

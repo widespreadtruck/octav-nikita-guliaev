@@ -68,17 +68,12 @@ const WalletAssetsList = (portfolioSummaryData: any): JSX.Element => {
             tokenName={value.symbol.toUpperCase()}
             symbol={value.symbol}
             fourDecimalsBalance={value.fourDecimalsStringBalance}
-            latestPrice={
-              typeof value.latestPrice === "number"
-                ? convertToCurrency(value.latestPrice, value.decimal)
-                : value.latestPrice
-            }
-            assetValue={
-              typeof value.assetValue === "number"
-                ? convertToCurrency(value.assetValue, null)
-                : value.assetValue
-            }
-          />
+            latestPrice={typeof value.latestPrice === "number"
+              ? convertToCurrency(value.latestPrice, value.decimal)
+              : value.latestPrice}
+            assetValue={typeof value.assetValue === "number"
+              ? convertToCurrency(value.assetValue, null)
+              : value.assetValue} imgLarge={''}          />
         ))}
       </ul>
     </>

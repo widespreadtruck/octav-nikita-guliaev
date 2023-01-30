@@ -24,7 +24,7 @@ const AssetSymbol = ({ assetData }: { assetData: any }) => {
         </S.SymbolImg>
       ) : (
         <S.SymbolImg>
-          <div className="mx-auto object-cover rounded-full ml-0 mr-0 h-full w-full bg-gray-300"></div>
+          <div className="mx-auto object-cover rounded-full ml-0 mr-0 h-full w-full bg-gray-100"></div>
         </S.SymbolImg>
       )}
     </div>

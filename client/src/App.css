@@ -11,7 +11,7 @@ ul li:last-child .listItem {
 }
 
 .listItem {
-  min-width: 500px;
+  min-width: 600px;
   max-width: 1000px;
 }
 
