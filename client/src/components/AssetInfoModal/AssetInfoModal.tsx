@@ -49,6 +49,13 @@ const initialAssetData: AssetData = {
   positiveReturn: true,
   openPnLPercentage: 0
 }
+
+/**
+ * This component is a summary of an asset.
+ * It contains all types of info such as Total Cost Basis,
+ * Open PnL, total balance, current price (fetched from DefiLlama),
+ * as well as a list of all the chains that have the asset
+ */
 const AssetInfoModal = () => {
   const portfolioData = usePortfolioData()
   const chainImages = useChainImages()

@@ -22,6 +22,7 @@ app.get("/wallet", (req, res) => {
   })
 })
 
+// fetches real price data from DefiLlama
 app.get('/get-prices/:query', (req, res) => {
   const { query } = req.params
   axios.get(`https://coins.llama.fi/prices/current/${query}`)
