@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { FC, useEffect, useState } from "react"
 import usePortfolioData from "../../components/hooks/usePortfolioData"
 import { useLocation } from "react-router-dom"
 import * as S from "./AssetInfoModal.styles"
@@ -11,6 +11,7 @@ import { convertToCurrency, convertToDecimals } from "../../Utils/Utils"
 import useChainImages from "../hooks/useChainImages"
 import OpenPnL from "../OpenPnL/OpenPnL"
 import ArrowLeft from '../../assets/ArrowLeft'
+import withLoading from "../../HOCs/withLoading"
 
 interface AssetData {
   name: string
@@ -50,18 +51,24 @@ const initialAssetData: AssetData = {
   openPnLPercentage: 0
 }
 
+interface Props {
+  isLoading: boolean
+  setIsLoading: any
+}
+
+
 /**
  * This component is a summary of an asset.
  * It contains all types of info such as Total Cost Basis,
  * Open PnL, total balance, current price (fetched from DefiLlama),
  * as well as a list of all the chains that have the asset
  */
-const AssetInfoModal = () => {
+const AssetInfoModal: FC<Props> = ({ isLoading, setIsLoading }) => {
   const portfolioData = usePortfolioData()
   const chainImages = useChainImages()
   const location = useLocation()
 
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  // const [isLoading, setIsLoading] = useState<boolean>(true)
   const [assetData, setAssetData] = useState<AssetData>(initialAssetData)
 
   const getAsset = (str: string) => {
@@ -90,7 +97,6 @@ const AssetInfoModal = () => {
       Object.values(portfolioData.wallet.chains).forEach((chain) => {
         chain.protocolPositions.WALLET.assets.forEach((asset) => {
           if (asset.symbol === assetSymbol) {
-            console.log(asset)
             assetsInfo.push(asset)
             query = asset.chainContract
             totalBalance += asset.balance
@@ -170,7 +176,6 @@ const AssetInfoModal = () => {
         }
       }
     }
-
   }, [portfolioData, chainImages])
 
   if (isLoading) {
@@ -218,4 +223,4 @@ const AssetInfoModal = () => {
   )
 }
 
-export default AssetInfoModal
+export default withLoading(AssetInfoModal)

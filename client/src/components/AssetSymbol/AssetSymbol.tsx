@@ -9,7 +9,6 @@ const AssetSymbol = ({ assetData }: { assetData: any }) => {
   const [imageLoaded, setImageLoaded] = useState(false)
 
   useEffect(() => {
-    console.log("assetData", assetData)
     const img = new Image()
     img.src = assetData.assetsInfo[0].imgLarge
     img.onload = () => {

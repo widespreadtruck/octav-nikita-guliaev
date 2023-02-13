@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react"
+import React, { FC, useEffect, useState, useMemo } from "react"
 import "../../App.css"
 import axios from "axios"
 import {
@@ -10,6 +10,7 @@ import SkeletonLoader from "../../components/SkeletonLoader/SkeletonLoader"
 import WalletAssetsList from "../../components/WalletAssetsList/WalletAssetsList"
 import usePortfolioData from "../../components/hooks/usePortfolioData"
 import * as S from "../../App.styles"
+import withLoading from "../../HOCs/withLoading"
 
 interface Error {
   message: string
@@ -38,10 +39,14 @@ export interface WalletAssetInfoTypes {
   }
 }
 
-const WalletPage: React.FC = React.memo(() => {
+interface Props {
+  isLoading: boolean
+  setIsLoading: any
+}
+
+const WalletPage: FC<Props> = ({ isLoading, setIsLoading }) => {
   const portfolioData = usePortfolioData()
 
-  const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<Error | null>(null)
   const [portfolioSummary, setPortfolioSummary] =
     useState<PortfolioSummaryTypes>({
@@ -85,7 +90,6 @@ const WalletPage: React.FC = React.memo(() => {
         }
       })
     })
-    console.log(walletAssetInfo)
     return walletAssetInfo
   }, [portfolioData])
 
@@ -164,6 +168,6 @@ const WalletPage: React.FC = React.memo(() => {
       </S.InnerWrapper>
     </S.Content>
   )
-})
+}
 
-export default WalletPage
+export default withLoading(WalletPage)
