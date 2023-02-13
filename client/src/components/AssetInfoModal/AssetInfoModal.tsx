@@ -147,7 +147,7 @@ const AssetInfoModal: FC<Props> = ({ isLoading, setIsLoading }) => {
 
             const currentTotalValueToDecimals = convertToDecimals(
               currentTotalValue,
-              decimal
+              2
             )
 
             assetCompleteInfo = {
@@ -156,8 +156,8 @@ const AssetInfoModal: FC<Props> = ({ isLoading, setIsLoading }) => {
               assetsInfo,
               assetSymbol,
               totalBalance: convertToDecimals(totalBalance, decimal),
-              purchasePrice: convertToCurrency(purchasePrice, decimal),
-              currPrice: convertToCurrency(currPrice, decimal),
+              purchasePrice: convertToCurrency(purchasePrice, 4),
+              currPrice: convertToCurrency(currPrice, 4),
               notConvertedCurrPrice: currPrice,
               currentTotalValue: convertToCurrency(
                 currentTotalValueToDecimals,

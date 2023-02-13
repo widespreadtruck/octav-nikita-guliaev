@@ -25,7 +25,7 @@ const ChainsList = ({ assetData }: { assetData: any }) => {
                 <S.Balance>
                   {convertToCurrency(
                     value.balance * assetData.notConvertedCurrPrice,
-                    value.decimal
+                    4
                   )}
                 </S.Balance>
               </S.ValueAndBalance>
