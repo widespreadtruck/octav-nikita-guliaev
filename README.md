@@ -27,3 +27,5 @@
  - Further, each asset page contains a list (if there are multiple i.e. ETH) of asset chains. Each contains the info on Chain name, asset name, balance on that chain, and total value held on that chain. Note, that if the purchase price was 0 (ie token drop happened (i.e. GEAR)) the OpenPnL would show "^MAX"
  - The asset icons on each page are lazy loaded and animated.
 
+https://user-images.githubusercontent.com/53960340/220960523-c6989a96-7442-4301-8436-60776833ae6c.mp4
+
