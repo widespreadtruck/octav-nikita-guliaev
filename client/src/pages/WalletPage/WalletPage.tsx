@@ -94,52 +94,66 @@ const WalletPage: FC<Props> = ({ isLoading, setIsLoading }) => {
   }, [portfolioData])
 
   useEffect(() => {
-    if (portfolioData) {
-      const copyWalletInfo = getWalletInformation
-      if (copyWalletInfo) {
-        const updatedWalletInfo = convertBalances(copyWalletInfo)
+    // Check if data is already in session storage
+    const savedData = sessionStorage.getItem("cachedPortfolioSummary")
+    if (savedData) {
+      const cachedPortfolioSummary = JSON.parse(savedData)
+      setPortfolioSummary(cachedPortfolioSummary)
+      // hides the loader once the data is ready
+      setIsLoading(false)
+    } else {
+      if (portfolioData) {
+        const copyWalletInfo = getWalletInformation
+        if (copyWalletInfo) {
+          const updatedWalletInfo = convertBalances(copyWalletInfo)
 
-        let priceQuery = ""
-        // this gets the info required to create the query for the DefiLLama price API call
-        for (let asset in updatedWalletInfo) {
-          priceQuery += `${updatedWalletInfo[asset].chainContract},`
-        }
+          let priceQuery = ""
+          // this gets the info required to create the query for the DefiLLama price API call
+          for (let asset in updatedWalletInfo) {
+            priceQuery += `${updatedWalletInfo[asset].chainContract},`
+          }
 
-        axios
-          .get(`/get-prices/${priceQuery}`)
-          .then((response) => {
-            const assetPriceData = response.data.coins
-            let totalWalletValue = 0
-            // add the Price data from DefiLlama to the object
-            for (const key in assetPriceData) {
-              const symbol = assetPriceData[key].symbol.toUpperCase()
-              const price = assetPriceData[key].price
-              for (const walletKey in updatedWalletInfo) {
-                // adds latest fetched asset price & calulates total basis
-                // for all assets where the live price is available from DefiLlama
-                if (walletKey.toUpperCase() === symbol) {
-                  const balance = updatedWalletInfo[walletKey].balance
-                  updatedWalletInfo[walletKey].latestPrice = price
-                  updatedWalletInfo[walletKey].assetValue = price * balance
-                  totalWalletValue = totalWalletValue + price * balance
+          axios
+            .get(`/get-prices/${priceQuery}`)
+            .then((response) => {
+              const assetPriceData = response.data.coins
+              let totalWalletValue = 0
+              // add the Price data from DefiLlama to the object
+              for (const key in assetPriceData) {
+                const symbol = assetPriceData[key].symbol.toUpperCase()
+                const price = assetPriceData[key].price
+                for (const walletKey in updatedWalletInfo) {
+                  // adds latest fetched asset price & calulates total basis
+                  // for all assets where the live price is available from DefiLlama
+                  if (walletKey.toUpperCase() === symbol) {
+                    const balance = updatedWalletInfo[walletKey].balance
+                    updatedWalletInfo[walletKey].latestPrice = price
+                    updatedWalletInfo[walletKey].assetValue = price * balance
+                    totalWalletValue = totalWalletValue + price * balance
+                  }
                 }
               }
-            }
 
-            const convertedToCurrencyTotalWalletValue = convertToCurrency(
-              totalWalletValue,
-              2
-            )
-            setPortfolioSummary({
-              updatedWalletInfo,
-              convertedToCurrencyTotalWalletValue,
+              const convertedToCurrencyTotalWalletValue = convertToCurrency(
+                totalWalletValue,
+                2
+              )
+              const combinedPortfolioSummary = {
+                updatedWalletInfo,
+                convertedToCurrencyTotalWalletValue,
+              }
+              setPortfolioSummary(combinedPortfolioSummary)
+              // hides the loader once the data is ready
+              setIsLoading(false)
+              sessionStorage.setItem(
+                "cachedPortfolioSummary",
+                JSON.stringify(combinedPortfolioSummary)
+              )
             })
-            // hides the loader once the data is ready
-            setIsLoading(false)
-          })
-          .catch((error) => {
-            setError(error)
-          })
+            .catch((error) => {
+              setError(error)
+            })
+        }
       }
     }
   }, [portfolioData, getWalletInformation])
