@@ -13,8 +13,9 @@
  2. **From the root folder** run the following scripts: "npm run server" and in the separate tab run "npm run client"
 
  ## App Features
- - The Express backend requests data from the JSON file and the DefiLlama API
+ - The Express backend requests data from the DefiLlama API and a JSON file
  - While the data is fetching on the /wallet page, a skeleton loader shows 
+ - The data is being cached on the first load. No API calls performed upon coming back to the main page.
  - On the '/wallet' page (the home page) the Price data is being fetched and the Assets are listed based on their total value in a descending order
  - Each Asset in the list displays a symbol name, a current real price, a total value (across all chains), and a total amount of tokens data
  - Prices are displayed with respect to the number of decimals required
@@ -27,5 +28,7 @@
  - Further, each asset page contains a list (if there are multiple i.e. ETH) of asset chains. Each contains the info on Chain name, asset name, balance on that chain, and total value held on that chain. Note, that if the purchase price was 0 (ie token drop happened (i.e. GEAR)) the OpenPnL would show "^MAX"
  - The asset icons on each page are lazy loaded and animated.
 
-https://user-images.githubusercontent.com/53960340/220960523-c6989a96-7442-4301-8436-60776833ae6c.mp4
+
+https://user-images.githubusercontent.com/53960340/220991481-12298c68-cefc-4ba1-9f0d-aba9afa3d1d7.mp4
+
 
